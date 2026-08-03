@@ -35,12 +35,13 @@ export const getChapter = async ({
     const chapter = await db.chapter.findUnique({
       where: {
         id: chapterId,
+        courseId,
         isPublished: true,
       }
     });
 
     if (!chapter || !course) {
-      throw new Error("Chapter or course not found");
+      throw new Error("No encontramos el curso o la lección");
     }
 
     let muxData = null;

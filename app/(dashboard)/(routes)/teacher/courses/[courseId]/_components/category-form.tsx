@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Textarea } from "@/components/ui/textarea";
 import { Combobox } from "@/components/ui/combobox";
 
 interface CategoryFormProps {
@@ -55,27 +54,27 @@ export const CategoryForm = ({
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       await axios.patch(`/api/courses/${courseId}`, values);
-      toast.success("Course updated");
+      toast.success("Categoría actualizada");
       toggleEdit();
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("No pudimos actualizar la categoría");
     }
   }
 
   const selectedOption = options.find((option) => option.value === initialData.categoryId);
 
   return (
-    <div className="mt-6 border bg-slate-100 rounded-md p-4">
+    <div className="mt-6 rounded-2xl border border-foreground/10 bg-card p-4">
       <div className="font-medium flex items-center justify-between">
-        Course category
+        Categoría
         <Button onClick={toggleEdit} variant="ghost">
           {isEditing ? (
-            <>Cancel</>
+            <>Cancelar</>
           ) : (
             <>
               <Pencil className="h-4 w-4 mr-2" />
-              Edit category
+              Editar
             </>
           )}
         </Button>
@@ -85,7 +84,7 @@ export const CategoryForm = ({
           "text-sm mt-2",
           !initialData.categoryId && "text-slate-500 italic"
         )}>
-          {selectedOption?.label || "No category"}
+          {selectedOption?.label || "Sin categoría"}
         </p>
       )}
       {isEditing && (
@@ -101,7 +100,7 @@ export const CategoryForm = ({
                 <FormItem>
                   <FormControl>
                     <Combobox
-                      options={...options}
+                      options={options}
                       {...field}
                     />
                   </FormControl>
@@ -114,7 +113,7 @@ export const CategoryForm = ({
                 disabled={!isValid || isSubmitting}
                 type="submit"
               >
-                Save
+                Guardar
               </Button>
             </div>
           </form>

@@ -3,21 +3,25 @@ import Link from "next/link";
 import { BookOpen } from "lucide-react";
 
 import { IconBadge } from "@/components/icon-badge";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, PriceValue } from "@/lib/format";
 import { CourseProgress } from "@/components/course-progress";
 
 interface CourseCardProps {
   id: string;
+  firstChapterId?: string;
+  nextChapterId?: string;
   title: string;
   imageUrl: string;
   chaptersLength: number;
-  price: number;
+  price: PriceValue;
   progress: number | null;
   category: string;
 };
 
 export const CourseCard = ({
   id,
+  firstChapterId,
+  nextChapterId,
   title,
   imageUrl,
   chaptersLength,
@@ -25,29 +29,35 @@ export const CourseCard = ({
   progress,
   category
 }: CourseCardProps) => {
+  const chapterId = nextChapterId || firstChapterId;
+  const href =
+    progress !== null && chapterId
+      ? `/cursos/${id}/capitulos/${chapterId}`
+      : `/cursos/${id}`;
+
   return (
-    <Link href={`/courses/${id}`}>
-      <div className="group hover:shadow-sm transition overflow-hidden border rounded-lg p-3 h-full">
-        <div className="relative w-full aspect-video rounded-md overflow-hidden">
+    <Link href={href}>
+      <div className="group h-full overflow-hidden rounded-[22px] border border-foreground/10 bg-card p-3 transition hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(30,24,20,0.10)]">
+        <div className="relative aspect-video w-full overflow-hidden rounded-[16px] bg-foreground">
           <Image
             fill
             className="object-cover"
             alt={title}
-            src={imageUrl}
+            src={imageUrl || "/logo.svg"}
           />
         </div>
         <div className="flex flex-col pt-2">
-          <div className="text-lg md:text-base font-medium group-hover:text-sky-700 transition line-clamp-2">
+          <div className="line-clamp-2 text-lg font-extrabold tracking-[-0.025em] transition group-hover:text-accent md:text-base">
             {title}
           </div>
           <p className="text-xs text-muted-foreground">
-            {category}
+            {category || "IA y producto"}
           </p>
           <div className="my-3 flex items-center gap-x-2 text-sm md:text-xs">
-            <div className="flex items-center gap-x-1 text-slate-500">
+            <div className="flex items-center gap-x-1 text-muted-foreground">
               <IconBadge size="sm" icon={BookOpen} />
               <span>
-                {chaptersLength} {chaptersLength === 1 ? "Chapter" : "Chapters"}
+                {chaptersLength} {chaptersLength === 1 ? "lección" : "lecciones"}
               </span>
             </div>
           </div>
@@ -58,7 +68,7 @@ export const CourseCard = ({
               value={progress}
             />
           ) : (
-            <p className="text-md md:text-sm font-medium text-slate-700">
+            <p className="text-md font-extrabold md:text-sm">
               {formatPrice(price)}
             </p>
           )}

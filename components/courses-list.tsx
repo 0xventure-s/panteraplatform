@@ -6,14 +6,17 @@ type CourseWithProgressWithCategory = Course & {
   category: Category | null;
   chapters: { id: string }[];
   progress: number | null;
+  nextChapterId?: string;
 };
 
 interface CoursesListProps {
   items: CourseWithProgressWithCategory[];
+  emptyState?: string;
 }
 
 export const CoursesList = ({
-  items
+  items,
+  emptyState = "No encontramos cursos con esos filtros.",
 }: CoursesListProps) => {
   return (
     <div>
@@ -22,6 +25,8 @@ export const CoursesList = ({
           <CourseCard
             key={item.id}
             id={item.id}
+            firstChapterId={item.chapters[0]?.id}
+            nextChapterId={item.nextChapterId}
             title={item.title}
             imageUrl={item.imageUrl!}
             chaptersLength={item.chapters.length}
@@ -32,8 +37,8 @@ export const CoursesList = ({
         ))}
       </div>
       {items.length === 0 && (
-        <div className="text-center text-sm text-muted-foreground mt-10">
-          No courses found
+        <div className="mt-10 rounded-2xl border border-dashed border-foreground/20 p-8 text-center text-sm text-muted-foreground">
+          {emptyState}
         </div>
       )}
     </div>

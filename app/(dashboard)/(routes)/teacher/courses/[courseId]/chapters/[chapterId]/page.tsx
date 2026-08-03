@@ -1,4 +1,3 @@
-import { auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Eye, LayoutDashboard, Video } from "lucide-react";
@@ -12,22 +11,24 @@ import { ChapterDescriptionForm } from "./_components/chapter-description-form";
 import { ChapterAccessForm } from "./_components/chapter-access-form";
 import { ChapterVideoForm } from "./_components/chapter-video-form";
 import { ChapterActions } from "./_components/chapter-actions";
+import { getAdminUserId } from "@/lib/admin";
 
 const ChapterIdPage = async ({
   params
 }: {
-  params: { courseId: string; chapterId: string }
+  params: Promise<{ courseId: string; chapterId: string }>
 }) => {
-  const { userId } = auth();
+  const { courseId, chapterId } = await params;
+  const userId = await getAdminUserId();
 
   if (!userId) {
-    return redirect("/");
+    return redirect("/dashboard");
   }
 
   const chapter = await db.chapter.findUnique({
     where: {
-      id: params.chapterId,
-      courseId: params.courseId
+      id: chapterId,
+      courseId
     },
     include: {
       muxData: true,
@@ -35,7 +36,7 @@ const ChapterIdPage = async ({
   });
 
   if (!chapter) {
-    return redirect("/")
+    return redirect(`/admin/cursos/${courseId}`)
   }
 
   const requiredFields = [
@@ -56,32 +57,32 @@ const ChapterIdPage = async ({
       {!chapter.isPublished && (
         <Banner
           variant="warning"
-          label="This chapter is unpublished. It will not be visible in the course"
+          label="Este capítulo está en borrador y todavía no es visible para los alumnos."
         />
       )}
-      <div className="p-6">
+      <div className="mx-auto max-w-7xl p-5 md:p-8 lg:p-10">
         <div className="flex items-center justify-between">
           <div className="w-full">
             <Link
-              href={`/teacher/courses/${params.courseId}`}
+              href={`/admin/cursos/${courseId}`}
               className="flex items-center text-sm hover:opacity-75 transition mb-6"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to course setup
+              Volver al curso
             </Link>
             <div className="flex items-center justify-between w-full">
               <div className="flex flex-col gap-y-2">
-                <h1 className="text-2xl font-medium">
-                  Chapter Creation
+                <h1 className="text-3xl font-extrabold tracking-[-0.04em]">
+                  Configuración del capítulo
                 </h1>
                 <span className="text-sm text-slate-700">
-                  Complete all fields {completionText}
+                  Completá los campos obligatorios {completionText}
                 </span>
               </div>
               <ChapterActions
                 disabled={!isComplete}
-                courseId={params.courseId}
-                chapterId={params.chapterId}
+                courseId={courseId}
+                chapterId={chapterId}
                 isPublished={chapter.isPublished}
               />
             </div>
@@ -93,31 +94,31 @@ const ChapterIdPage = async ({
               <div className="flex items-center gap-x-2">
                 <IconBadge icon={LayoutDashboard} />
                 <h2 className="text-xl">
-                  Customize your chapter
+                  Contenido
                 </h2>
               </div>
               <ChapterTitleForm
                 initialData={chapter}
-                courseId={params.courseId}
-                chapterId={params.chapterId}
+                courseId={courseId}
+                chapterId={chapterId}
               />
               <ChapterDescriptionForm
                 initialData={chapter}
-                courseId={params.courseId}
-                chapterId={params.chapterId}
+                courseId={courseId}
+                chapterId={chapterId}
               />
             </div>
             <div>
               <div className="flex items-center gap-x-2">
                 <IconBadge icon={Eye} />
                 <h2 className="text-xl">
-                  Access Settings
+                  Acceso
                 </h2>
               </div>
               <ChapterAccessForm
                 initialData={chapter}
-                courseId={params.courseId}
-                chapterId={params.chapterId}
+                courseId={courseId}
+                chapterId={chapterId}
               />
             </div>
           </div>
@@ -125,13 +126,13 @@ const ChapterIdPage = async ({
             <div className="flex items-center gap-x-2">
               <IconBadge icon={Video} />
               <h2 className="text-xl">
-                Add a video
+                Video de la lección
               </h2>
             </div>
             <ChapterVideoForm
               initialData={chapter}
-              chapterId={params.chapterId}
-              courseId={params.courseId}
+              chapterId={chapterId}
+              courseId={courseId}
             />
           </div>
         </div>

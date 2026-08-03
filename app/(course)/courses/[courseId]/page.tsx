@@ -4,11 +4,12 @@ import { redirect } from "next/navigation";
 const CourseIdPage = async ({
   params
 }: {
-  params: { courseId: string; }
+  params: Promise<{ courseId: string }>
 }) => {
+  const { courseId } = await params;
   const course = await db.course.findUnique({
     where: {
-      id: params.courseId,
+      id: courseId,
     },
     include: {
       chapters: {
@@ -23,10 +24,14 @@ const CourseIdPage = async ({
   });
 
   if (!course) {
-    return redirect("/");
+    return redirect("/cursos");
   }
 
-  return redirect(`/courses/${course.id}/chapters/${course.chapters[0].id}`);
+  if (!course.chapters[0]) {
+    return redirect(`/cursos/${course.id}`);
+  }
+
+  return redirect(`/cursos/${course.id}/capitulos/${course.chapters[0].id}`);
 }
  
 export default CourseIdPage;

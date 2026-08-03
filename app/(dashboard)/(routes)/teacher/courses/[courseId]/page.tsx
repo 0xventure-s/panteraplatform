@@ -1,4 +1,3 @@
-import { auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import { CircleDollarSign, File, LayoutDashboard, ListChecks } from "lucide-react";
 
@@ -14,21 +13,23 @@ import { PriceForm } from "./_components/price-form";
 import { AttachmentForm } from "./_components/attachment-form";
 import { ChaptersForm } from "./_components/chapters-form";
 import { Actions } from "./_components/actions";
+import { getAdminUserId } from "@/lib/admin";
 
 const CourseIdPage = async ({
   params
 }: {
-  params: { courseId: string }
+  params: Promise<{ courseId: string }>
 }) => {
-  const { userId } = auth();
+  const { courseId } = await params;
+  const userId = await getAdminUserId();
 
   if (!userId) {
-    return redirect("/");
+    return redirect("/dashboard");
   }
 
   const course = await db.course.findUnique({
     where: {
-      id: params.courseId,
+      id: courseId,
       userId
     },
     include: {
@@ -52,7 +53,7 @@ const CourseIdPage = async ({
   });
 
   if (!course) {
-    return redirect("/");
+    return redirect("/admin/cursos");
   }
 
   const requiredFields = [
@@ -75,22 +76,22 @@ const CourseIdPage = async ({
     <>
       {!course.isPublished && (
         <Banner
-          label="This course is unpublished. It will not be visible to the students."
+          label="Este curso está en borrador y todavía no es visible para los alumnos."
         />
       )}
-      <div className="p-6">
+      <div className="mx-auto max-w-7xl p-5 md:p-8 lg:p-10">
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-y-2">
-            <h1 className="text-2xl font-medium">
-              Course setup
+            <h1 className="text-3xl font-extrabold tracking-[-0.04em]">
+              Configuración del curso
             </h1>
             <span className="text-sm text-slate-700">
-              Complete all fields {completionText}
+              Completá los campos obligatorios {completionText}
             </span>
           </div>
           <Actions
             disabled={!isComplete}
-            courseId={params.courseId}
+            courseId={courseId}
             isPublished={course.isPublished}
           />
         </div>
@@ -99,7 +100,7 @@ const CourseIdPage = async ({
             <div className="flex items-center gap-x-2">
               <IconBadge icon={LayoutDashboard} />
               <h2 className="text-xl">
-                Customize your course
+                  Información principal
               </h2>
             </div>
             <TitleForm
@@ -128,7 +129,7 @@ const CourseIdPage = async ({
               <div className="flex items-center gap-x-2">
                 <IconBadge icon={ListChecks} />
                 <h2 className="text-xl">
-                  Course chapters
+                  Programa del curso
                 </h2>
               </div>
               <ChaptersForm
@@ -140,7 +141,7 @@ const CourseIdPage = async ({
               <div className="flex items-center gap-x-2">
                 <IconBadge icon={CircleDollarSign} />
                 <h2 className="text-xl">
-                  Sell your course
+                  Precio y venta
                 </h2>
               </div>
               <PriceForm
@@ -152,7 +153,7 @@ const CourseIdPage = async ({
               <div className="flex items-center gap-x-2">
                 <IconBadge icon={File} />
                 <h2 className="text-xl">
-                  Resources & Attachments
+                  Recursos descargables
                 </h2>
               </div>
               <AttachmentForm

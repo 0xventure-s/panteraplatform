@@ -1,12 +1,12 @@
-import { Category, Chapter, Course } from "@prisma/client";
+import { Category, Course } from "@prisma/client";
 
 import { db } from "@/lib/db";
-import { getProgress } from "@/actions/get-progress";
 
 type CourseWithProgressWithCategory = Course & {
-  category: Category;
-  chapters: Chapter[];
+  category: Category | null;
+  chapters: { id: string }[];
   progress: number | null;
+  nextChapterId?: string;
 };
 
 type DashboardCourses = {
@@ -27,19 +27,44 @@ export const getDashboardCourses = async (userId: string): Promise<DashboardCour
             chapters: {
               where: {
                 isPublished: true,
-              }
+              },
+              orderBy: {
+                position: "asc",
+              },
+              include: {
+                userProgress: {
+                  where: {
+                    userId,
+                  },
+                  select: {
+                    isCompleted: true,
+                  },
+                },
+              },
             }
           }
         }
       }
     });
 
-    const courses = purchasedCourses.map((purchase) => purchase.course) as CourseWithProgressWithCategory[];
+    const courses = purchasedCourses.map(({ course }) => {
+      const completedChapters = course.chapters.filter(
+        (chapter) => chapter.userProgress[0]?.isCompleted,
+      ).length;
+      const progress = course.chapters.length
+        ? (completedChapters / course.chapters.length) * 100
+        : 0;
+      const nextChapter = course.chapters.find(
+        (chapter) => !chapter.userProgress[0]?.isCompleted,
+      );
 
-    for (let course of courses) {
-      const progress = await getProgress(userId, course.id);
-      course["progress"] = progress;
-    }
+      return {
+        ...course,
+        chapters: course.chapters.map(({ id }) => ({ id })),
+        progress,
+        nextChapterId: nextChapter?.id,
+      };
+    }) satisfies CourseWithProgressWithCategory[];
 
     const completedCourses = courses.filter((course) => course.progress === 100);
     const coursesInProgress = courses.filter((course) => (course.progress ?? 0) < 100);

@@ -9,6 +9,7 @@ import {
 } from "recharts";
 
 import { Card } from "@/components/ui/card";
+import { formatPrice } from "@/lib/format";
 
 interface ChartProps {
   data: {
@@ -36,12 +37,12 @@ export const Chart = ({
             fontSize={12}
             tickLine={false}
             axisLine={false}
-            tickFormatter={(value) => `$${value}`}
+            tickFormatter={(value) => formatPrice(value)}
           />
           <Bar
             dataKey="total"
-            fill="#0369a1"
-            radius={[4, 4, 0, 0]}
+            fill="#ff5c35"
+            radius={[10, 10, 0, 0]}
           />
         </BarChart>
       </ResponsiveContainer>

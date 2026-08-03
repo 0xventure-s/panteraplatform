@@ -1,34 +1,44 @@
-import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
 import { db } from "@/lib/db";
+import { getAdminUserId } from "@/lib/admin";
+
+const createChapterSchema = z.object({
+  title: z.string().trim().min(1).max(160),
+}).strict();
 
 export async function POST(
   req: Request,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
-    const { userId } = auth();
-    const { title } = await req.json();
+    const userId = await getAdminUserId();
+    const { courseId } = await params;
+    const input = createChapterSchema.safeParse(await req.json());
 
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return new NextResponse("No autorizado", { status: 401 });
+    }
+
+    if (!input.success) {
+      return new NextResponse("El título no es válido", { status: 400 });
     }
 
     const courseOwner = await db.course.findUnique({
       where: {
-        id: params.courseId,
+        id: courseId,
         userId: userId,
       }
     });
 
     if (!courseOwner) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return new NextResponse("No autorizado", { status: 401 });
     }
 
     const lastChapter = await db.chapter.findFirst({
       where: {
-        courseId: params.courseId,
+        courseId,
       },
       orderBy: {
         position: "desc",
@@ -39,8 +49,8 @@ export async function POST(
 
     const chapter = await db.chapter.create({
       data: {
-        title,
-        courseId: params.courseId,
+        title: input.data.title,
+        courseId,
         position: newPosition,
       }
     });
@@ -48,6 +58,6 @@ export async function POST(
     return NextResponse.json(chapter);
   } catch (error) {
     console.log("[CHAPTERS]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    return new NextResponse("Error interno", { status: 500 });
   }
 }

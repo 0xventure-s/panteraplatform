@@ -19,7 +19,7 @@ interface ImageFormProps {
 
 const formSchema = z.object({
   imageUrl: z.string().min(1, {
-    message: "Image is required",
+    message: "Agregá una imagen",
   }),
 });
 
@@ -36,32 +36,32 @@ export const ImageForm = ({
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       await axios.patch(`/api/courses/${courseId}`, values);
-      toast.success("Course updated");
+      toast.success("Portada actualizada");
       toggleEdit();
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("No pudimos actualizar la portada");
     }
   }
 
   return (
-    <div className="mt-6 border bg-slate-100 rounded-md p-4">
+    <div className="mt-6 rounded-2xl border border-foreground/10 bg-card p-4">
       <div className="font-medium flex items-center justify-between">
-        Course image
+        Portada
         <Button onClick={toggleEdit} variant="ghost">
           {isEditing && (
-            <>Cancel</>
+            <>Cancelar</>
           )}
           {!isEditing && !initialData.imageUrl && (
             <>
               <PlusCircle className="h-4 w-4 mr-2" />
-              Add an image
+              Agregar imagen
             </>
           )}
           {!isEditing && initialData.imageUrl && (
             <>
               <Pencil className="h-4 w-4 mr-2" />
-              Edit image
+              Cambiar imagen
             </>
           )}
         </Button>
@@ -74,7 +74,7 @@ export const ImageForm = ({
         ) : (
           <div className="relative aspect-video mt-2">
             <Image
-              alt="Upload"
+              alt={`Portada de ${initialData.title}`}
               fill
               className="object-cover rounded-md"
               src={initialData.imageUrl}
@@ -93,7 +93,7 @@ export const ImageForm = ({
             }}
           />
           <div className="text-xs text-muted-foreground mt-4">
-            16:9 aspect ratio recommended
+            Usá una imagen horizontal en proporción 16:9.
           </div>
         </div>
       )}

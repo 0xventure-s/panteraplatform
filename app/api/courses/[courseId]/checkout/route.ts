@@ -1,96 +1,117 @@
-import Stripe from "stripe";
-import { currentUser } from "@clerk/nextjs";
+import crypto from "crypto";
 import { NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
-import { stripe } from "@/lib/stripe";
+import {
+  createMercadoPagoPreference,
+  getMercadoPagoAccess,
+} from "@/lib/mercado-pago";
+import { toPriceNumber } from "@/lib/format";
+import { getCurrentUser } from "@/lib/session";
 
 export async function POST(
   req: Request,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
-    const user = await currentUser();
+    void req;
+    const user = await getCurrentUser();
+    const { courseId } = await params;
 
-    if (!user || !user.id || !user.emailAddresses?.[0]?.emailAddress) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    if (!user?.id || !user.email) {
+      return NextResponse.json({ error: "Ingresá para comprar el curso." }, { status: 401 });
     }
 
     const course = await db.course.findUnique({
       where: {
-        id: params.courseId,
+        id: courseId,
         isPublished: true,
       }
     });
+
+    if (!course) {
+      return NextResponse.json({ error: "El curso no está disponible." }, { status: 404 });
+    }
 
     const purchase = await db.purchase.findUnique({
       where: {
         userId_courseId: {
           userId: user.id,
-          courseId: params.courseId
+          courseId
         }
       }
     });
 
     if (purchase) {
-      return new NextResponse("Already purchased", { status: 400 });
+      return NextResponse.json({ url: `/cursos/${course.id}` });
     }
 
-    if (!course) {
-      return new NextResponse("Not found", { status: 404 });
+    if (!course.price || toPriceNumber(course.price) <= 0) {
+      return NextResponse.json({ error: "El curso todavía no tiene un precio válido." }, { status: 400 });
     }
 
-    const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [
-      {
-        quantity: 1,
-        price_data: {
-          currency: "USD",
-          product_data: {
-            name: course.title,
-            description: course.description!,
-          },
-          unit_amount: Math.round(course.price! * 100),
-        }
-      }
-    ];
+    const mercadoPago = await getMercadoPagoAccess();
 
-    let stripeCustomer = await db.stripeCustomer.findUnique({
-      where: {
+    if (!mercadoPago) {
+      return NextResponse.json(
+        { error: "Los pagos todavía no están habilitados." },
+        { status: 503 },
+      );
+    }
+
+    const email = user.email;
+    const payment = await db.payment.create({
+      data: {
+        externalReference: crypto.randomUUID(),
+        amount: course.price,
+        currency: "ARS",
+        payerEmail: email,
         userId: user.id,
-      },
-      select: {
-        stripeCustomerId: true,
-      }
-    });
-
-    if (!stripeCustomer) {
-      const customer = await stripe.customers.create({
-        email: user.emailAddresses[0].emailAddress,
-      });
-
-      stripeCustomer = await db.stripeCustomer.create({
-        data: {
-          userId: user.id,
-          stripeCustomerId: customer.id,
-        }
-      });
-    }
-
-    const session = await stripe.checkout.sessions.create({
-      customer: stripeCustomer.stripeCustomerId,
-      line_items,
-      mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/courses/${course.id}?success=1`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/courses/${course.id}?canceled=1`,
-      metadata: {
         courseId: course.id,
-        userId: user.id,
-      }
+      },
     });
 
-    return NextResponse.json({ url: session.url });
+    try {
+      const preference = await createMercadoPagoPreference(
+        mercadoPago.accessToken,
+        {
+          externalReference: payment.externalReference,
+          title: course.title,
+          price: toPriceNumber(course.price),
+          payerEmail: email,
+          courseId: course.id,
+          paymentId: payment.id,
+          userId: user.id,
+        },
+      );
+
+      await db.payment.update({
+        where: { id: payment.id },
+        data: { preferenceId: preference.id },
+      });
+
+      const url = mercadoPago.liveMode
+        ? preference.init_point
+        : preference.sandbox_init_point || preference.init_point;
+
+      if (!url) {
+        throw new Error("Mercado Pago no devolvió una URL de pago");
+      }
+
+      return NextResponse.json({ url });
+    } catch (error) {
+      await db.payment.update({
+        where: { id: payment.id },
+        data: {
+          status: "REJECTED",
+          providerStatus: "preference_error",
+        },
+      });
+      throw error;
+    }
   } catch (error) {
-    console.log("[COURSE_ID_CHECKOUT]", error);
-    return new NextResponse("Internal Error", { status: 500 })
+    console.error("[COURSE_ID_CHECKOUT]", error);
+    const message = error instanceof Error ? error.message : "No pudimos iniciar el pago.";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

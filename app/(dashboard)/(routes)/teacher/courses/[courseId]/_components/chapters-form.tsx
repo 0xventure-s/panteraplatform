@@ -57,11 +57,11 @@ export const ChaptersForm = ({
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       await axios.post(`/api/courses/${courseId}/chapters`, values);
-      toast.success("Chapter created");
+      toast.success("Capítulo creado");
       toggleCreating();
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("No pudimos crear el capítulo");
     }
   }
 
@@ -72,35 +72,35 @@ export const ChaptersForm = ({
       await axios.put(`/api/courses/${courseId}/chapters/reorder`, {
         list: updateData
       });
-      toast.success("Chapters reordered");
+      toast.success("Orden actualizado");
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("No pudimos actualizar el orden");
     } finally {
       setIsUpdating(false);
     }
   }
 
   const onEdit = (id: string) => {
-    router.push(`/teacher/courses/${courseId}/chapters/${id}`);
+    router.push(`/admin/cursos/${courseId}/capitulos/${id}`);
   }
 
   return (
-    <div className="relative mt-6 border bg-slate-100 rounded-md p-4">
+    <div className="relative mt-6 rounded-2xl border border-foreground/10 bg-card p-4">
       {isUpdating && (
         <div className="absolute h-full w-full bg-slate-500/20 top-0 right-0 rounded-m flex items-center justify-center">
           <Loader2 className="animate-spin h-6 w-6 text-sky-700" />
         </div>
       )}
       <div className="font-medium flex items-center justify-between">
-        Course chapters
+        Capítulos
         <Button onClick={toggleCreating} variant="ghost">
           {isCreating ? (
-            <>Cancel</>
+            <>Cancelar</>
           ) : (
             <>
               <PlusCircle className="h-4 w-4 mr-2" />
-              Add a chapter
+              Agregar capítulo
             </>
           )}
         </Button>
@@ -119,7 +119,7 @@ export const ChaptersForm = ({
                   <FormControl>
                     <Input
                       disabled={isSubmitting}
-                      placeholder="e.g. 'Introduction to the course'"
+                      placeholder="Ej.: Del problema al primer prototipo"
                       {...field}
                     />
                   </FormControl>
@@ -131,7 +131,7 @@ export const ChaptersForm = ({
               disabled={!isValid || isSubmitting}
               type="submit"
             >
-              Create
+              Crear
             </Button>
           </form>
         </Form>
@@ -141,7 +141,7 @@ export const ChaptersForm = ({
           "text-sm mt-2",
           !initialData.chapters.length && "text-slate-500 italic"
         )}>
-          {!initialData.chapters.length && "No chapters"}
+          {!initialData.chapters.length && "Todavía no agregaste capítulos"}
           <ChaptersList
             onEdit={onEdit}
             onReorder={onReorder}
@@ -151,7 +151,7 @@ export const ChaptersForm = ({
       )}
       {!isCreating && (
         <p className="text-xs text-muted-foreground mt-4">
-          Drag and drop to reorder the chapters
+          Arrastrá los capítulos para cambiar el orden.
         </p>
       )}
     </div>

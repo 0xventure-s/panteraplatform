@@ -1,16 +1,16 @@
 {
-  "name": "lms-tutorial",
+  "name": "franco-alonso-cursos",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "typecheck": "tsc --noEmit",
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.23.5",
     "@hello-pangea/dnd": "^16.3.0",
     "@hookform/resolvers": "^3.3.1",
     "@mux/mux-node": "^7.3.1",
@@ -32,13 +32,13 @@
     "@uploadthing/react": "^5.5.0",
     "autoprefixer": "10.4.15",
     "axios": "^1.5.0",
+    "better-auth": "^1.6.25",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "cmdk": "^0.2.0",
-    "eslint": "8.49.0",
-    "eslint-config-next": "13.4.12",
+    "eslint-config-next": "^15.5.21",
     "lucide-react": "^0.276.0",
-    "next": "13.4.12",
+    "next": "^15.5.21",
     "postcss": "8.4.29",
     "query-string": "^8.1.0",
     "react": "18.2.0",
@@ -50,7 +50,6 @@
     "react-icons": "^4.11.0",
     "react-quill": "^2.0.0",
     "recharts": "^2.8.0",
-    "stripe": "^13.6.0",
     "tailwind-merge": "^1.14.0",
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.7",
@@ -60,6 +59,7 @@
     "zustand": "^4.4.1"
   },
   "devDependencies": {
+    "eslint": "^8.57.1",
     "prisma": "^5.3.0"
   }
 }

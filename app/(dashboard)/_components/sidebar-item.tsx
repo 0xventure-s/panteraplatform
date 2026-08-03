@@ -20,7 +20,6 @@ export const SidebarItem = ({
   const router = useRouter();
 
   const isActive =
-    (pathname === "/" && href === "/") ||
     pathname === href ||
     pathname?.startsWith(`${href}/`);
 
@@ -33,26 +32,20 @@ export const SidebarItem = ({
       onClick={onClick}
       type="button"
       className={cn(
-        "flex items-center gap-x-2 text-slate-500 text-sm font-[500] pl-6 transition-all hover:text-slate-600 hover:bg-slate-300/20",
-        isActive && "text-sky-700 bg-sky-200/20 hover:bg-sky-200/20 hover:text-sky-700"
+        "mx-3 flex items-center gap-x-2 rounded-xl pl-3 text-sm font-bold text-muted-foreground transition-all hover:bg-muted hover:text-foreground",
+        isActive && "bg-foreground text-background hover:bg-foreground hover:text-background"
       )}
     >
-      <div className="flex items-center gap-x-2 py-4">
+      <div className="flex items-center gap-x-3 py-3">
         <Icon
           size={22}
           className={cn(
-            "text-slate-500",
-            isActive && "text-sky-700"
+            "text-muted-foreground",
+            isActive && "text-secondary"
           )}
         />
         {label}
       </div>
-      <div
-        className={cn(
-          "ml-auto opacity-0 border-2 border-sky-700 h-full transition-all",
-          isActive && "opacity-100"
-        )}
-      />
     </button>
   )
 }

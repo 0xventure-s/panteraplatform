@@ -1,4 +1,3 @@
-import { auth } from "@clerk/nextjs";
 import { Chapter, Course, UserProgress } from "@prisma/client"
 import { redirect } from "next/navigation";
 
@@ -6,6 +5,7 @@ import { db } from "@/lib/db";
 import { CourseProgress } from "@/components/course-progress";
 
 import { CourseSidebarItem } from "./course-sidebar-item";
+import { getCurrentUserId } from "@/lib/session";
 
 interface CourseSidebarProps {
   course: Course & {
@@ -20,10 +20,10 @@ export const CourseSidebar = async ({
   course,
   progressCount,
 }: CourseSidebarProps) => {
-  const { userId } = auth();
+  const userId = await getCurrentUserId();
 
   if (!userId) {
-    return redirect("/");
+    return redirect("/sign-in");
   }
 
   const purchase = await db.purchase.findUnique({
@@ -36,13 +36,14 @@ export const CourseSidebar = async ({
   });
 
   return (
-    <div className="h-full border-r flex flex-col overflow-y-auto shadow-sm">
-      <div className="p-8 flex flex-col border-b">
-        <h1 className="font-semibold">
+    <div className="flex h-full flex-col overflow-y-auto border-r border-foreground/10 bg-card">
+      <div className="flex flex-col border-b border-foreground/10 p-7">
+        <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-accent">Curso</p>
+        <h1 className="mt-3 text-xl font-extrabold leading-tight tracking-[-0.03em]">
           {course.title}
         </h1>
         {purchase && (
-          <div className="mt-10">
+          <div className="mt-7">
             <CourseProgress
               variant="success"
               value={progressCount}

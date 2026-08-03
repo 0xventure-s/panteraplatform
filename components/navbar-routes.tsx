@@ -1,22 +1,34 @@
 "use client";
 
-import { UserButton, useAuth } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { ArrowLeft, Loader2, LogOut, Settings, User } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { isTeacher } from "@/lib/teacher";
-
+import { authClient } from "@/lib/auth-client";
 import { SearchInput } from "./search-input";
 
-export const NavbarRoutes = () => {
-  const { userId } = useAuth();
+export const NavbarRoutes = ({ canAccessAdmin = false }: { canAccessAdmin?: boolean }) => {
   const pathname = usePathname();
+  const { data: session } = authClient.useSession();
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
-  const isTeacherPage = pathname?.startsWith("/teacher");
-  const isCoursePage = pathname?.includes("/courses");
+  const isAdminPage = pathname?.startsWith("/admin");
+  const isCoursePage = pathname?.includes("/courses") || pathname?.includes("/capitulos/");
   const isSearchPage = pathname === "/search";
+
+  const onSignOut = async () => {
+    setIsSigningOut(true);
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          window.location.assign("/");
+        },
+      },
+    });
+    setIsSigningOut(false);
+  };
 
   return (
     <>
@@ -26,23 +38,41 @@ export const NavbarRoutes = () => {
         </div>
       )}
       <div className="flex gap-x-2 ml-auto">
-        {isTeacherPage || isCoursePage ? (
-          <Link href="/">
+        {isAdminPage || isCoursePage ? (
+          <Link href="/dashboard">
             <Button size="sm" variant="ghost">
-              <LogOut className="h-4 w-4 mr-2" />
-              Exit
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Volver al campus
             </Button>
           </Link>
-        ) : isTeacher(userId) ? (
-          <Link href="/teacher/courses">
-            <Button size="sm" variant="ghost">
-              Teacher mode
+        ) : canAccessAdmin ? (
+          <Link href="/admin/cursos">
+            <Button size="sm" variant="outline" className="rounded-full">
+              <Settings className="mr-2 h-4 w-4" />
+              Administración
             </Button>
           </Link>
         ) : null}
-        <UserButton
-          afterSignOutUrl="/"
-        />
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          onClick={onSignOut}
+          disabled={isSigningOut}
+          className="rounded-full"
+          title={session?.user.name || "Cerrar sesión"}
+        >
+          {isSigningOut ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <>
+              <User className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">{session?.user.name || "Mi cuenta"}</span>
+              <LogOut className="ml-2 hidden h-4 w-4 sm:block" />
+            </>
+          )}
+          <span className="sr-only">Cerrar sesión</span>
+        </Button>
       </div>
     </>
   )

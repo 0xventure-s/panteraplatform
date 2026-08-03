@@ -1,6 +1,11 @@
-export const formatPrice = (price: number) => {
-  return new Intl.NumberFormat("en-US", {
+export type PriceValue = number | string | { toString(): string };
+
+export const toPriceNumber = (price: PriceValue) => Number(price.toString());
+
+export const formatPrice = (price: PriceValue) => {
+  return new Intl.NumberFormat("es-AR", {
     style: "currency",
-    currency: "USD"
-  }).format(price)
-}
+    currency: "ARS",
+    maximumFractionDigits: 0,
+  }).format(toPriceNumber(price));
+};

@@ -1,51 +1,53 @@
-import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
+import { getAdminUserId } from "@/lib/admin";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { courseId: string; chapterId: string } }
+  { params }: { params: Promise<{ courseId: string; chapterId: string }> }
 ) {
   try {
-    const { userId } = auth();
+    void req;
+    const userId = await getAdminUserId();
+    const { courseId, chapterId } = await params;
 
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return new NextResponse("No autorizado", { status: 401 });
     }
 
     const ownCourse = await db.course.findUnique({
       where: {
-        id: params.courseId,
+        id: courseId,
         userId
       }
     });
 
     if (!ownCourse) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return new NextResponse("No autorizado", { status: 401 });
     }
 
     const chapter = await db.chapter.findUnique({
       where: {
-        id: params.chapterId,
-        courseId: params.courseId,
+        id: chapterId,
+        courseId,
       }
     });
 
     const muxData = await db.muxData.findUnique({
       where: {
-        chapterId: params.chapterId,
+        chapterId,
       }
     });
 
     if (!chapter || !muxData || !chapter.title || !chapter.description || !chapter.videoUrl) {
-      return new NextResponse("Missing required fields", { status: 400 });
+      return new NextResponse("Faltan campos obligatorios", { status: 400 });
     }
 
     const publishedChapter = await db.chapter.update({
       where: {
-        id: params.chapterId,
-        courseId: params.courseId,
+        id: chapterId,
+        courseId,
       },
       data: {
         isPublished: true,
@@ -55,6 +57,6 @@ export async function PATCH(
     return NextResponse.json(publishedChapter);
   } catch (error) {
     console.log("[CHAPTER_PUBLISH]", error);
-    return new NextResponse("Internal Error", { status: 500 }); 
+    return new NextResponse("Error interno", { status: 500 });
   }
 }

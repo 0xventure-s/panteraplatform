@@ -31,16 +31,16 @@ export const Actions = ({
 
       if (isPublished) {
         await axios.patch(`/api/courses/${courseId}/unpublish`);
-        toast.success("Course unpublished");
+        toast.success("Curso pasado a borrador");
       } else {
         await axios.patch(`/api/courses/${courseId}/publish`);
-        toast.success("Course published");
+        toast.success("Curso publicado");
         confetti.onOpen();
       }
 
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("No pudimos cambiar el estado del curso");
     } finally {
       setIsLoading(false);
     }
@@ -52,11 +52,11 @@ export const Actions = ({
 
       await axios.delete(`/api/courses/${courseId}`);
 
-      toast.success("Course deleted");
+      toast.success("Curso eliminado");
       router.refresh();
-      router.push(`/teacher/courses`);
+      router.push(`/admin/cursos`);
     } catch {
-      toast.error("Something went wrong");
+      toast.error("No pudimos eliminar el curso");
     } finally {
       setIsLoading(false);
     }
@@ -70,7 +70,7 @@ export const Actions = ({
         variant="outline"
         size="sm"
       >
-        {isPublished ? "Unpublish" : "Publish"}
+        {isPublished ? "Pasar a borrador" : "Publicar"}
       </Button>
       <ConfirmModal onConfirm={onDelete}>
         <Button size="sm" disabled={isLoading}>

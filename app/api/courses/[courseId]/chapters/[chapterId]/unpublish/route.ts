@@ -1,34 +1,36 @@
-import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
+import { getAdminUserId } from "@/lib/admin";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { courseId: string; chapterId: string } }
+  { params }: { params: Promise<{ courseId: string; chapterId: string }> }
 ) {
   try {
-    const { userId } = auth();
+    void req;
+    const userId = await getAdminUserId();
+    const { courseId, chapterId } = await params;
 
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return new NextResponse("No autorizado", { status: 401 });
     }
 
     const ownCourse = await db.course.findUnique({
       where: {
-        id: params.courseId,
+        id: courseId,
         userId
       }
     });
 
     if (!ownCourse) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return new NextResponse("No autorizado", { status: 401 });
     }
 
     const unpublishedChapter = await db.chapter.update({
       where: {
-        id: params.chapterId,
-        courseId: params.courseId,
+        id: chapterId,
+        courseId,
       },
       data: {
         isPublished: false,
@@ -37,7 +39,7 @@ export async function PATCH(
 
     const publishedChaptersInCourse = await db.chapter.findMany({
       where: {
-        courseId: params.courseId,
+        courseId,
         isPublished: true,
       }
     });
@@ -45,7 +47,7 @@ export async function PATCH(
     if (!publishedChaptersInCourse.length) {
       await db.course.update({
         where: {
-          id: params.courseId,
+          id: courseId,
         },
         data: {
           isPublished: false,
@@ -56,6 +58,6 @@ export async function PATCH(
     return NextResponse.json(unpublishedChapter);
   } catch (error) {
     console.log("[CHAPTER_UNPUBLISH]", error);
-    return new NextResponse("Internal Error", { status: 500 }); 
+    return new NextResponse("Error interno", { status: 500 });
   }
 }

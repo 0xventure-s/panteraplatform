@@ -1,14 +1,15 @@
 "use client";
 
 import axios from "axios";
+import { CreditCard, Loader2 } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
 import { Button } from "@/components/ui/button";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, PriceValue } from "@/lib/format";
 
 interface CourseEnrollButtonProps {
-  price: number;
+  price: PriceValue;
   courseId: string;
 }
 
@@ -25,8 +26,11 @@ export const CourseEnrollButton = ({
       const response = await axios.post(`/api/courses/${courseId}/checkout`)
 
       window.location.assign(response.data.url);
-    } catch {
-      toast.error("Something went wrong");
+    } catch (error) {
+      const message = axios.isAxiosError(error)
+        ? error.response?.data?.error
+        : null;
+      toast.error(message || "No pudimos iniciar el pago");
     } finally {
       setIsLoading(false);
     }
@@ -36,10 +40,15 @@ export const CourseEnrollButton = ({
     <Button
       onClick={onClick}
       disabled={isLoading}
-      size="sm"
-      className="w-full md:w-auto"
+      size="lg"
+      className="w-full rounded-full bg-[#009ee3] font-extrabold text-white hover:bg-[#008ac7]"
     >
-      Enroll for {formatPrice(price)}
+      {isLoading ? (
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+      ) : (
+        <CreditCard className="mr-2 h-4 w-4" />
+      )}
+      Comprar con Mercado Pago · {formatPrice(price)}
     </Button>
   )
 }

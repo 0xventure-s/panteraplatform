@@ -10,35 +10,35 @@ body,
  
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 42 33% 96%;
+    --foreground: 20 10% 10%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 40 38% 98%;
+    --card-foreground: 20 10% 10%;
  
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
  
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 20 10% 10%;
+    --primary-foreground: 42 33% 96%;
  
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 72 100% 69%;
+    --secondary-foreground: 20 10% 10%;
  
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 36 18% 90%;
+    --muted-foreground: 24 6% 42%;
  
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 13 100% 61%;
+    --accent-foreground: 20 10% 10%;
  
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 28 12% 82%;
+    --input: 28 12% 82%;
+    --ring: 20 10% 10%;
  
-    --radius: 0.5rem;
+    --radius: 0.85rem;
   }
  
   .dark {
@@ -78,7 +78,35 @@ body,
   }
   body {
     @apply bg-background text-foreground;
+    text-rendering: optimizeLegibility;
   }
+}
+
+::selection {
+  background: hsl(var(--secondary));
+  color: hsl(var(--secondary-foreground));
+}
+
+.paper-grid {
+  background-image:
+    linear-gradient(to right, hsl(var(--border) / 0.45) 1px, transparent 1px),
+    linear-gradient(to bottom, hsl(var(--border) / 0.45) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.soft-noise {
+  background-image: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.72), transparent 34%),
+    radial-gradient(circle at 80% 10%, rgba(217, 255, 99, 0.28), transparent 28%),
+    radial-gradient(circle at 70% 80%, rgba(255, 92, 53, 0.18), transparent 30%);
+}
+
+@keyframes float-object {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+}
+
+.float-object {
+  animation: float-object 7s ease-in-out infinite;
 }
 
 .ql-container {

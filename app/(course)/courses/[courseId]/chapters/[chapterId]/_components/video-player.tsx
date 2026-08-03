@@ -44,15 +44,15 @@ export const VideoPlayer = ({
           confetti.onOpen();
         }
 
-        toast.success("Progress updated");
+        toast.success("Progreso guardado");
         router.refresh();
 
         if (nextChapterId) {
-          router.push(`/courses/${courseId}/chapters/${nextChapterId}`)
+          router.push(`/cursos/${courseId}/capitulos/${nextChapterId}`)
         }
       }
     } catch {
-      toast.error("Something went wrong");
+      toast.error("No pudimos guardar el progreso");
     }
   }
 
@@ -67,7 +67,7 @@ export const VideoPlayer = ({
         <div className="absolute inset-0 flex items-center justify-center bg-slate-800 flex-col gap-y-2 text-secondary">
           <Lock className="h-8 w-8" />
           <p className="text-sm">
-            This chapter is locked
+            Comprá el curso para ver esta lección
           </p>
         </div>
       )}

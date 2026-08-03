@@ -55,25 +55,25 @@ export const ChapterDescriptionForm = ({
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, values);
-      toast.success("Chapter updated");
+      toast.success("Descripción actualizada");
       toggleEdit();
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("No pudimos actualizar la descripción");
     }
   }
 
   return (
-    <div className="mt-6 border bg-slate-100 rounded-md p-4">
+    <div className="mt-6 rounded-2xl border border-foreground/10 bg-card p-4">
       <div className="font-medium flex items-center justify-between">
-        Chapter description
+        Descripción
         <Button onClick={toggleEdit} variant="ghost">
           {isEditing ? (
-            <>Cancel</>
+            <>Cancelar</>
           ) : (
             <>
               <Pencil className="h-4 w-4 mr-2" />
-              Edit description
+              Editar
             </>
           )}
         </Button>
@@ -83,7 +83,7 @@ export const ChapterDescriptionForm = ({
           "text-sm mt-2",
           !initialData.description && "text-slate-500 italic"
         )}>
-          {!initialData.description && "No description"}
+          {!initialData.description && "Todavía no agregaste una descripción"}
           {initialData.description && (
             <Preview
               value={initialData.description}
@@ -116,7 +116,7 @@ export const ChapterDescriptionForm = ({
                 disabled={!isValid || isSubmitting}
                 type="submit"
               >
-                Save
+                Guardar
               </Button>
             </div>
           </form>

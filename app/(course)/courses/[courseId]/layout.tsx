@@ -1,4 +1,3 @@
-import { auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 
 import { db } from "@/lib/db";
@@ -6,23 +5,25 @@ import { getProgress } from "@/actions/get-progress";
 
 import { CourseSidebar } from "./_components/course-sidebar";
 import { CourseNavbar } from "./_components/course-navbar";
+import { getCurrentUserId } from "@/lib/session";
 
 const CourseLayout = async ({
   children,
   params
 }: {
   children: React.ReactNode;
-  params: { courseId: string };
+  params: Promise<{ courseId: string }>;
 }) => {
-  const { userId } = auth();
+  const { courseId } = await params;
+  const userId = await getCurrentUserId();
 
   if (!userId) {
-    return redirect("/")
+    return redirect("/sign-in")
   }
 
   const course = await db.course.findUnique({
     where: {
-      id: params.courseId,
+      id: courseId,
     },
     include: {
       chapters: {
@@ -44,14 +45,14 @@ const CourseLayout = async ({
   });
 
   if (!course) {
-    return redirect("/");
+    return redirect("/cursos");
   }
 
   const progressCount = await getProgress(userId, course.id);
 
   return (
-    <div className="h-full">
-      <div className="h-[80px] md:pl-80 fixed inset-y-0 w-full z-50">
+    <div className="min-h-full bg-background">
+      <div className="fixed inset-y-0 z-50 h-[76px] w-full md:pl-80">
         <CourseNavbar
           course={course}
           progressCount={progressCount}
@@ -63,7 +64,7 @@ const CourseLayout = async ({
           progressCount={progressCount}
         />
       </div>
-      <main className="md:pl-80 pt-[80px] h-full">
+      <main className="min-h-full pt-[76px] md:pl-80">
         {children}
       </main>
     </div>

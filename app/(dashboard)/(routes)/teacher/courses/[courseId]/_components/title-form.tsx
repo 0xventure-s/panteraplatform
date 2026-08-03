@@ -28,7 +28,7 @@ interface TitleFormProps {
 
 const formSchema = z.object({
   title: z.string().min(1, {
-    message: "Title is required",
+    message: "Ingresá un título",
   }),
 });
 
@@ -52,25 +52,25 @@ export const TitleForm = ({
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       await axios.patch(`/api/courses/${courseId}`, values);
-      toast.success("Course updated");
+      toast.success("Título actualizado");
       toggleEdit();
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("No pudimos actualizar el título");
     }
   }
 
   return (
-    <div className="mt-6 border bg-slate-100 rounded-md p-4">
+    <div className="mt-6 rounded-2xl border border-foreground/10 bg-card p-4">
       <div className="font-medium flex items-center justify-between">
-        Course title
+        Título
         <Button onClick={toggleEdit} variant="ghost">
           {isEditing ? (
-            <>Cancel</>
+            <>Cancelar</>
           ) : (
             <>
               <Pencil className="h-4 w-4 mr-2" />
-              Edit title
+              Editar
             </>
           )}
         </Button>
@@ -94,7 +94,7 @@ export const TitleForm = ({
                   <FormControl>
                     <Input
                       disabled={isSubmitting}
-                      placeholder="e.g. 'Advanced web development'"
+                      placeholder="Ej.: Construí tu primer producto con IA"
                       {...field}
                     />
                   </FormControl>
@@ -107,7 +107,7 @@ export const TitleForm = ({
                 disabled={!isValid || isSubmitting}
                 type="submit"
               >
-                Save
+                Guardar
               </Button>
             </div>
           </form>

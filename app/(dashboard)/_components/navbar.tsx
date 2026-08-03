@@ -1,12 +1,16 @@
 import { NavbarRoutes } from "@/components/navbar-routes"
 
 import { MobileSidebar } from "./mobile-sidebar"
+import { isAdmin } from "@/lib/admin";
+import { getCurrentUser } from "@/lib/session";
 
-export const Navbar = () => {
+export const Navbar = async () => {
+  const user = await getCurrentUser();
+
   return (
-    <div className="p-4 border-b h-full flex items-center bg-white shadow-sm">
+    <div className="flex h-full items-center border-b border-foreground/10 bg-background/90 px-4 backdrop-blur-xl md:px-6">
       <MobileSidebar />
-      <NavbarRoutes />
+      <NavbarRoutes canAccessAdmin={isAdmin(user)} />
     </div>
   )
 }

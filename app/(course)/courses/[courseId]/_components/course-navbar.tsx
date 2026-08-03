@@ -3,6 +3,8 @@ import { Chapter, Course, UserProgress } from "@prisma/client"
 import { NavbarRoutes } from "@/components/navbar-routes";
 
 import { CourseMobileSidebar } from "./course-mobile-sidebar";
+import { isAdmin } from "@/lib/admin";
+import { getCurrentUser } from "@/lib/session";
 
 interface CourseNavbarProps {
   course: Course & {
@@ -13,17 +15,19 @@ interface CourseNavbarProps {
   progressCount: number;
 };
 
-export const CourseNavbar = ({
+export const CourseNavbar = async ({
   course,
   progressCount,
 }: CourseNavbarProps) => {
+  const user = await getCurrentUser();
+
   return (
-    <div className="p-4 border-b h-full flex items-center bg-white shadow-sm">
+    <div className="flex h-full items-center border-b border-foreground/10 bg-background/90 p-4 backdrop-blur-xl">
       <CourseMobileSidebar
         course={course}
         progressCount={progressCount}
       />
-      <NavbarRoutes />      
+      <NavbarRoutes canAccessAdmin={isAdmin(user)} />
     </div>
   )
 }

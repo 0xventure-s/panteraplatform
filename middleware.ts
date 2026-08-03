@@ -1,13 +1,36 @@
-import { authMiddleware } from "@clerk/nextjs";
- 
-// This example protects all routes including api/trpc routes
-// Please edit this to allow other routes to be public as needed.
-// See https://clerk.com/docs/references/nextjs/auth-middleware for more information about configuring your middleware
-export default authMiddleware({
-  publicRoutes: ["/api/webhook"]
-});
- 
+import { getSessionCookie } from "better-auth/cookies";
+import { NextRequest, NextResponse } from "next/server";
+
+const publicPathPatterns = [
+  /^\/$/,
+  /^\/cursos(?:\/[^/]+)?$/,
+  /^\/pagos\/resultado$/,
+  /^\/sign-in(?:\/.*)?$/,
+  /^\/sign-up(?:\/.*)?$/,
+  /^\/recuperar-acceso$/,
+  /^\/restablecer-clave$/,
+  /^\/api\/auth(?:\/.*)?$/,
+  /^\/api\/webhooks\/mercadopago$/,
+];
+
+export default function middleware(request: NextRequest) {
+  const { pathname, search } = request.nextUrl;
+  const isPublicPath = publicPathPatterns.some((pattern) => pattern.test(pathname));
+
+  if (isPublicPath || getSessionCookie(request)) {
+    return NextResponse.next();
+  }
+
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  const signInUrl = new URL("/sign-in", request.url);
+  signInUrl.searchParams.set("callbackURL", `${pathname}${search}`);
+
+  return NextResponse.redirect(signInUrl);
+}
+
 export const config = {
   matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
 };
- 

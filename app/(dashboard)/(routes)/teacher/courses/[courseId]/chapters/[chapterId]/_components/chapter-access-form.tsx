@@ -16,12 +16,9 @@ import {
   FormDescription,
   FormField,
   FormItem,
-  FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Editor } from "@/components/editor";
-import { Preview } from "@/components/preview";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface ChapterAccessFormProps {
@@ -57,25 +54,25 @@ export const ChapterAccessForm = ({
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, values);
-      toast.success("Chapter updated");
+      toast.success("Acceso actualizado");
       toggleEdit();
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("No pudimos actualizar el acceso");
     }
   }
 
   return (
-    <div className="mt-6 border bg-slate-100 rounded-md p-4">
+    <div className="mt-6 rounded-2xl border border-foreground/10 bg-card p-4">
       <div className="font-medium flex items-center justify-between">
-        Chapter access
+        Tipo de acceso
         <Button onClick={toggleEdit} variant="ghost">
           {isEditing ? (
-            <>Cancel</>
+            <>Cancelar</>
           ) : (
             <>
               <Pencil className="h-4 w-4 mr-2" />
-              Edit access
+              Editar
             </>
           )}
         </Button>
@@ -86,9 +83,9 @@ export const ChapterAccessForm = ({
           !initialData.isFree && "text-slate-500 italic"
         )}>
           {initialData.isFree ? (
-            <>This chapter is free for preview.</>
+            <>Disponible como vista previa gratuita.</>
           ) : (
-            <>This chapter is not free.</>
+            <>Disponible únicamente con la compra del curso.</>
           )}
         </p>
       )}
@@ -111,7 +108,7 @@ export const ChapterAccessForm = ({
                   </FormControl>
                   <div className="space-y-1 leading-none">
                     <FormDescription>
-                      Check this box if you want to make this chapter free for preview
+                      Habilitar esta lección como vista previa gratuita.
                     </FormDescription>
                   </div>
                 </FormItem>
@@ -122,7 +119,7 @@ export const ChapterAccessForm = ({
                 disabled={!isValid || isSubmitting}
                 type="submit"
               >
-                Save
+                Guardar
               </Button>
             </div>
           </form>

@@ -39,13 +39,13 @@ export const CourseProgressButton = ({
       }
 
       if (!isCompleted && nextChapterId) {
-        router.push(`/courses/${courseId}/chapters/${nextChapterId}`);
+        router.push(`/cursos/${courseId}/capitulos/${nextChapterId}`);
       }
 
-      toast.success("Progress updated");
+      toast.success(isCompleted ? "Lección marcada como pendiente" : "Progreso guardado");
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("No pudimos actualizar el progreso");
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +61,7 @@ export const CourseProgressButton = ({
       variant={isCompleted ? "outline" : "success"}
       className="w-full md:w-auto"
     >
-      {isCompleted ? "Not completed" : "Mark as complete"}
+      {isCompleted ? "Marcar como pendiente" : "Completar lección"}
       <Icon className="h-4 w-4 ml-2" />
     </Button>
   )

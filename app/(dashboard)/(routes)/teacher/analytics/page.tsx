@@ -1,16 +1,16 @@
-import { auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 
 import { getAnalytics } from "@/actions/get-analytics";
 
 import { DataCard } from "./_components/data-card";
 import { Chart } from "./_components/chart";
+import { getAdminUserId } from "@/lib/admin";
 
 const AnalyticsPage = async () => {
-  const { userId } = auth();
+  const userId = await getAdminUserId();
 
   if (!userId) {
-    return redirect("/");
+    return redirect("/dashboard");
   }
 
   const {
@@ -20,15 +20,20 @@ const AnalyticsPage = async () => {
   } = await getAnalytics(userId);
 
   return ( 
-    <div className="p-6">
+    <div className="mx-auto max-w-7xl p-5 md:p-8 lg:p-10">
+      <div className="mb-7">
+        <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-accent">Administración</p>
+        <h1 className="mt-2 text-3xl font-extrabold tracking-[-0.04em]">Analíticas</h1>
+        <p className="mt-3 text-sm text-muted-foreground">Solo se contabilizan pagos aprobados por Mercado Pago.</p>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <DataCard
-          label="Total Revenue"
+          label="Ingresos confirmados"
           value={totalRevenue}
           shouldFormat
         />
         <DataCard
-          label="Total Sales"
+          label="Ventas aprobadas"
           value={totalSales}
         />
       </div>

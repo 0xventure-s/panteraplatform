@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
   title: z.string().min(1, {
-    message: "Title is required",
+    message: "Ingresá un título",
   }),
 });
 
@@ -40,21 +40,22 @@ const CreatePage = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const response = await axios.post("/api/courses", values);
-      router.push(`/teacher/courses/${response.data.id}`);
-      toast.success("Course created");
+      router.push(`/admin/cursos/${response.data.id}`);
+      toast.success("Curso creado");
     } catch {
-      toast.error("Something went wrong");
+      toast.error("No pudimos crear el curso");
     }
   }
 
   return ( 
-    <div className="max-w-5xl mx-auto flex md:items-center md:justify-center h-full p-6">
-      <div>
-        <h1 className="text-2xl">
-          Name your course
+    <div className="mx-auto flex h-full max-w-5xl p-6 md:items-center md:justify-center">
+      <div className="w-full max-w-xl rounded-[28px] border border-foreground/10 bg-card p-7 md:p-10">
+        <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-accent">Nuevo curso</p>
+        <h1 className="mt-3 text-3xl font-extrabold tracking-[-0.04em]">
+          Empezá por el nombre
         </h1>
-        <p className="text-sm text-slate-600">
-          What would you like to name your course? Don&apos;t worry, you can change this later.
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+          Usá un título claro. Podés cambiarlo antes de publicar.
         </p>
         <Form {...form}>
           <form
@@ -67,36 +68,36 @@ const CreatePage = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Course title
+                    Título del curso
                   </FormLabel>
                   <FormControl>
                     <Input
                       disabled={isSubmitting}
-                      placeholder="e.g. 'Advanced web development'"
+                      placeholder="Ej.: Construí tu primer producto con IA"
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    What will you teach in this course?
+                    Este nombre será visible en el catálogo y en el campus.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <div className="flex items-center gap-x-2">
-              <Link href="/">
+              <Link href="/admin/cursos">
                 <Button
                   type="button"
                   variant="ghost"
                 >
-                  Cancel
+                  Cancelar
                 </Button>
               </Link>
               <Button
                 type="submit"
                 disabled={!isValid || isSubmitting}
               >
-                Continue
+                Continuar
               </Button>
             </div>
           </form>

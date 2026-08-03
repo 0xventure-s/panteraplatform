@@ -1,19 +1,19 @@
 import { db } from "@/lib/db";
-import { Course, Purchase } from "@prisma/client";
+import { Course, Payment, PaymentStatus } from "@prisma/client";
 
-type PurchaseWithCourse = Purchase & {
+type PaymentWithCourse = Payment & {
   course: Course;
 };
 
-const groupByCourse = (purchases: PurchaseWithCourse[]) => {
+const groupByCourse = (payments: PaymentWithCourse[]) => {
   const grouped: { [courseTitle: string]: number } = {};
   
-  purchases.forEach((purchase) => {
-    const courseTitle = purchase.course.title;
+  payments.forEach((payment) => {
+    const courseTitle = payment.course.title;
     if (!grouped[courseTitle]) {
       grouped[courseTitle] = 0;
     }
-    grouped[courseTitle] += purchase.course.price!;
+    grouped[courseTitle] += Number(payment.amount.toString());
   });
 
   return grouped;
@@ -21,8 +21,9 @@ const groupByCourse = (purchases: PurchaseWithCourse[]) => {
 
 export const getAnalytics = async (userId: string) => {
   try {
-    const purchases = await db.purchase.findMany({
+    const payments = await db.payment.findMany({
       where: {
+        status: PaymentStatus.APPROVED,
         course: {
           userId: userId
         }
@@ -32,14 +33,14 @@ export const getAnalytics = async (userId: string) => {
       }
     });
 
-    const groupedEarnings = groupByCourse(purchases);
+    const groupedEarnings = groupByCourse(payments);
     const data = Object.entries(groupedEarnings).map(([courseTitle, total]) => ({
       name: courseTitle,
       total: total,
     }));
 
     const totalRevenue = data.reduce((acc, curr) => acc + curr.total, 0);
-    const totalSales = purchases.length;
+    const totalSales = payments.length;
 
     return {
       data,
