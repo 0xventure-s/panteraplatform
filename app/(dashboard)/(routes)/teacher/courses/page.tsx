@@ -14,13 +14,19 @@ const CoursesPage = async () => {
   }
 
   const courses = await db.course.findMany({
-    where: {
-      userId,
-    },
-    orderBy: {
-      createdAt: "desc",
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      title: true,
+      price: true,
+      isPublished: true,
     },
   });
+  const rows = courses.map((course) => ({
+    ...course,
+    price: course.price ? Number(course.price) : null,
+  }));
 
   return ( 
     <div className="mx-auto max-w-7xl p-5 md:p-8 lg:p-10">
@@ -28,7 +34,7 @@ const CoursesPage = async () => {
         <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-accent">Administración</p>
         <h1 className="mt-2 text-3xl font-extrabold tracking-[-0.04em]">Cursos</h1>
       </div>
-      <DataTable columns={columns} data={courses} />
+      <DataTable columns={columns} data={rows} />
     </div>
    );
 }

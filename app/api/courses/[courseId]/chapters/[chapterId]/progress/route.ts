@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
@@ -8,34 +9,40 @@ export async function PUT(
   { params }: { params: Promise<{ courseId: string; chapterId: string }> }
 ) {
   try {
-    const userId = await getCurrentUserId();
-    const { courseId, chapterId } = await params;
-    const { isCompleted } = await req.json();
+    const [userId, { courseId, chapterId }, body] = await Promise.all([
+      getCurrentUserId(),
+      params,
+      req.json() as Promise<{ isCompleted: boolean }>,
+    ]);
+    const { isCompleted } = body;
 
     if (!userId) {
       return new NextResponse("No autorizado", { status: 401 });
     } 
 
-    const chapter = await db.chapter.findUnique({
-      where: {
-        id: chapterId,
-        courseId,
-        isPublished: true,
-      },
-    });
+    const [chapter, purchase] = await Promise.all([
+      db.chapter.findUnique({
+        where: {
+          id: chapterId,
+          courseId,
+          isPublished: true,
+        },
+        select: { id: true, isFree: true },
+      }),
+      db.purchase.findUnique({
+        where: {
+          userId_courseId: {
+            userId,
+            courseId,
+          },
+        },
+        select: { id: true },
+      }),
+    ]);
 
     if (!chapter) {
       return new NextResponse("Capítulo no encontrado", { status: 404 });
     }
-
-    const purchase = await db.purchase.findUnique({
-      where: {
-        userId_courseId: {
-          userId,
-          courseId,
-        },
-      },
-    });
 
     if (!chapter.isFree && !purchase) {
       return new NextResponse("No tenés acceso a este capítulo", { status: 403 });
@@ -56,7 +63,9 @@ export async function PUT(
         chapterId,
         isCompleted,
       }
-    })
+    });
+
+    revalidateTag("community-leaderboard");
 
     return NextResponse.json(userProgress);
   } catch (error) {

@@ -13,6 +13,7 @@ export const Navbar = async () => {
       <NavbarRoutes
         canAccessAdmin={isAdmin(user)}
         isAuthenticated={Boolean(user)}
+        userName={user?.name}
       />
     </div>
   )

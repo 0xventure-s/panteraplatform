@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { cn } from "@/lib/utils";
 import { resolveProfileAvatar } from "@/lib/profile-avatar";
 
@@ -23,6 +25,18 @@ export const ProfileAvatar = ({
   className,
 }: ProfileAvatarProps) => {
   const imageUrl = resolveProfileAvatar(userId, image);
+  const isOptimizableImage = (() => {
+    if (imageUrl.startsWith("/")) {
+      return true;
+    }
+
+    try {
+      const hostname = new URL(imageUrl).hostname;
+      return hostname === "utfs.io" || hostname.endsWith(".ufs.sh");
+    } catch {
+      return false;
+    }
+  })();
 
   return (
     <div
@@ -34,11 +48,25 @@ export const ProfileAvatar = ({
       )}
     >
       {getInitials(name)}
-      <span
-        aria-hidden="true"
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${JSON.stringify(imageUrl)})` }}
-      />
+      {isOptimizableImage ? (
+        <Image
+          src={imageUrl}
+          alt=""
+          fill
+          sizes="144px"
+          className="object-cover"
+        />
+      ) : (
+        // User-provided hosts cannot safely be enabled in the image proxy.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={imageUrl}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      )}
     </div>
   );
 };

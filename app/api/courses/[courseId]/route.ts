@@ -1,4 +1,5 @@
 import Mux from "@mux/mux-node";
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -59,17 +60,20 @@ export async function DELETE(
       return new NextResponse("Curso no encontrado", { status: 404 });
     }
 
-    for (const chapter of course.chapters) {
-      if (chapter.muxData?.assetId) {
-        await Video.Assets.del(chapter.muxData.assetId);
-      }
-    }
+    await Promise.all(
+      course.chapters
+        .map((chapter) => chapter.muxData?.assetId)
+        .filter((assetId): assetId is string => Boolean(assetId))
+        .map((assetId) => Video.Assets.del(assetId)),
+    );
 
     const deletedCourse = await db.course.delete({
       where: {
         id: courseId,
       },
     });
+
+    revalidateTag("courses");
 
     return NextResponse.json(deletedCourse);
   } catch (error) {
@@ -104,6 +108,8 @@ export async function PATCH(
         ...input.data,
       }
     });
+
+    revalidateTag("courses");
 
     return NextResponse.json(course);
   } catch (error) {

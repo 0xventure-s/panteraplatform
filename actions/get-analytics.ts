@@ -1,58 +1,67 @@
+import { PaymentStatus } from "@prisma/client";
+
 import { db } from "@/lib/db";
-import { Course, Payment, PaymentStatus } from "@prisma/client";
-
-type PaymentWithCourse = Payment & {
-  course: Course;
-};
-
-const groupByCourse = (payments: PaymentWithCourse[]) => {
-  const grouped: { [courseTitle: string]: number } = {};
-  
-  payments.forEach((payment) => {
-    const courseTitle = payment.course.title;
-    if (!grouped[courseTitle]) {
-      grouped[courseTitle] = 0;
-    }
-    grouped[courseTitle] += Number(payment.amount.toString());
-  });
-
-  return grouped;
-};
 
 export const getAnalytics = async (userId: string) => {
   try {
-    const payments = await db.payment.findMany({
+    const totalsByCourse = await db.payment.groupBy({
+      by: ["courseId"],
       where: {
         status: PaymentStatus.APPROVED,
-        course: {
-          userId: userId
-        }
+        course: { userId },
       },
-      include: {
-        course: true,
-      }
+      _sum: { amount: true },
+      _count: { _all: true },
     });
 
-    const groupedEarnings = groupByCourse(payments);
-    const data = Object.entries(groupedEarnings).map(([courseTitle, total]) => ({
-      name: courseTitle,
-      total: total,
-    }));
+    if (totalsByCourse.length === 0) {
+      return {
+        data: [],
+        totalRevenue: 0,
+        totalSales: 0,
+      };
+    }
 
-    const totalRevenue = data.reduce((acc, curr) => acc + curr.total, 0);
-    const totalSales = payments.length;
+    const courses = await db.course.findMany({
+      where: {
+        id: { in: totalsByCourse.map((total) => total.courseId) },
+        userId,
+      },
+      select: { id: true, title: true },
+    });
+    const totals = new Map(
+      totalsByCourse.map((total) => [total.courseId, total]),
+    );
+    const groupedEarnings = new Map<string, number>();
+
+    for (const course of courses) {
+      const total = totals.get(course.id);
+      const amount = Number(total?._sum.amount?.toString() ?? 0);
+      groupedEarnings.set(
+        course.title,
+        (groupedEarnings.get(course.title) ?? 0) + amount,
+      );
+    }
+
+    const data = Array.from(groupedEarnings, ([name, total]) => ({
+      name,
+      total,
+    }));
 
     return {
       data,
-      totalRevenue,
-      totalSales,
-    }
+      totalRevenue: data.reduce((sum, item) => sum + item.total, 0),
+      totalSales: totalsByCourse.reduce(
+        (sum, total) => sum + total._count._all,
+        0,
+      ),
+    };
   } catch (error) {
-    console.log("[GET_ANALYTICS]", error);
+    console.error("[GET_ANALYTICS]", error);
     return {
       data: [],
       totalRevenue: 0,
       totalSales: 0,
-    }
+    };
   }
-}
+};

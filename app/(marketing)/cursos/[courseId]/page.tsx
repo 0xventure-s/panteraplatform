@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
-import { cache } from "react";
 import {
   ArrowLeft,
   BookOpen,
@@ -16,11 +16,12 @@ import {
   PlayCircle,
   Star,
   Target,
-  User,
   X,
 } from "lucide-react";
 
 import { CourseEnrollButton } from "@/app/(course)/courses/[courseId]/chapters/[chapterId]/_components/course-enroll-button";
+import { ProfileAvatar } from "@/components/community/profile-avatar";
+import { CourseTile } from "@/components/marketing/course-tile";
 import { Preview } from "@/components/preview";
 import { Button } from "@/components/ui/button";
 import { WhatsAppButton } from "@/components/whatsapp-button";
@@ -32,27 +33,67 @@ import { CourseReviewForm } from "./_components/course-review-form";
 import { CourseTrailer } from "./_components/course-trailer";
 import { LessonPreview } from "./_components/lesson-preview";
 
-const getPublicCourse = cache((courseId: string) =>
-  db.course.findUnique({
+const getPublicCourse = unstable_cache(
+  async (courseId: string) => {
+    const course = await db.course.findUnique({
     where: {
       id: courseId,
       isPublished: true,
     },
-    include: {
-      category: true,
+    select: {
+      id: true,
+      userId: true,
+      title: true,
+      subtitle: true,
+      description: true,
+      imageUrl: true,
+      price: true,
+      level: true,
+      estimatedMinutes: true,
+      outcomes: true,
+      targetAudience: true,
+      notForAudience: true,
+      prerequisites: true,
+      projectTitle: true,
+      projectDescription: true,
+      projectImageUrl: true,
+      categoryId: true,
+      category: {
+        select: { name: true },
+      },
       attachments: {
         select: { id: true },
       },
       chapters: {
         where: { isPublished: true },
-        include: { muxData: true },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          moduleTitle: true,
+          durationMinutes: true,
+          isFree: true,
+          isTrailer: true,
+          muxData: {
+            select: { playbackId: true },
+          },
+        },
         orderBy: { position: "asc" },
       },
       faqs: {
         orderBy: { position: "asc" },
+        select: {
+          id: true,
+          question: true,
+          answer: true,
+        },
       },
       reviews: {
-        include: {
+        select: {
+          id: true,
+          userId: true,
+          rating: true,
+          comment: true,
           user: {
             select: {
               id: true,
@@ -64,7 +105,74 @@ const getPublicCourse = cache((courseId: string) =>
         orderBy: { updatedAt: "desc" },
       },
     },
-  }),
+    });
+
+    return course
+      ? {
+          ...course,
+          price: course.price?.toString() ?? null,
+        }
+      : null;
+  },
+  ["public-course-v2"],
+  { revalidate: 30, tags: ["courses"] },
+);
+
+const recommendedCourseSelect = {
+  id: true,
+  title: true,
+  subtitle: true,
+  description: true,
+  imageUrl: true,
+  price: true,
+  category: {
+    select: { name: true },
+  },
+  chapters: {
+    where: { isPublished: true },
+    select: { id: true },
+  },
+} as const;
+
+const getRecommendedCourses = unstable_cache(
+  async (courseId: string, categoryId?: string | null) => {
+    const [relatedCourses, recentCourses] = await Promise.all([
+      categoryId
+        ? db.course.findMany({
+          where: {
+            id: { not: courseId },
+            categoryId,
+            isPublished: true,
+          },
+          select: recommendedCourseSelect,
+          orderBy: { createdAt: "desc" },
+          take: 3,
+        })
+        : Promise.resolve([]),
+      db.course.findMany({
+      where: {
+        id: { not: courseId },
+        isPublished: true,
+      },
+      select: recommendedCourseSelect,
+      orderBy: { createdAt: "desc" },
+      take: 3,
+      }),
+    ]);
+
+    return [...relatedCourses, ...recentCourses]
+      .filter(
+        (course, index, courses) =>
+          courses.findIndex((candidate) => candidate.id === course.id) === index,
+      )
+      .slice(0, 3)
+      .map((course) => ({
+        ...course,
+        price: course.price?.toString() ?? null,
+      }));
+  },
+  ["recommended-courses-v2"],
+  { revalidate: 60, tags: ["courses"] },
 );
 
 const stripHtml = (value: string) =>
@@ -183,14 +291,16 @@ export default async function PublicCoursePage({
   params: Promise<{ courseId: string }>;
 }) {
   const { courseId } = await params;
-  const course = await getPublicCourse(courseId);
+  const [course, userId] = await Promise.all([
+    getPublicCourse(courseId),
+    getCurrentUserId(),
+  ]);
 
   if (!course) {
     notFound();
   }
 
-  const [userId, instructor] = await Promise.all([
-    getCurrentUserId(),
+  const [instructor, recommendedCourses, purchase] = await Promise.all([
     db.user.findUnique({
       where: { id: course.userId },
       select: {
@@ -200,18 +310,19 @@ export default async function PublicCoursePage({
         bio: true,
       },
     }),
-  ]);
-  const purchase = userId
-    ? await db.purchase.findUnique({
-        where: {
-          userId_courseId: {
-            userId,
-            courseId: course.id,
+    getRecommendedCourses(course.id, course.categoryId),
+    userId
+      ? db.purchase.findUnique({
+          where: {
+            userId_courseId: {
+              userId,
+              courseId: course.id,
+            },
           },
-        },
-        select: { id: true },
-      })
-    : null;
+          select: { id: true },
+        })
+      : Promise.resolve(null),
+  ]);
 
   const hasAccess = Boolean(purchase);
   const firstChapter = course.chapters[0];
@@ -612,20 +723,12 @@ export default async function PublicCoursePage({
           {instructor && (
             <section id="docente" className="scroll-mt-40 rounded-[34px] border border-foreground/10 bg-card p-6 sm:p-9">
               <div className="grid items-center gap-7 sm:grid-cols-[140px_1fr]">
-                <div className="relative aspect-square overflow-hidden rounded-[28px] bg-muted">
-                  {instructor.image ? (
-                    <div
-                      role="img"
-                      aria-label={instructor.name}
-                      className="h-full w-full bg-cover bg-center"
-                      style={{ backgroundImage: `url(${instructor.image})` }}
-                    />
-                  ) : (
-                    <div className="grid h-full place-items-center">
-                      <User className="h-12 w-12 text-muted-foreground" />
-                    </div>
-                  )}
-                </div>
+                <ProfileAvatar
+                  userId={course.userId}
+                  name={instructor.name}
+                  image={instructor.image}
+                  className="aspect-square w-full text-4xl"
+                />
                 <div>
                   <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-accent">Docente</p>
                   <h2 className="mt-3 font-display text-4xl leading-none">{instructor.name}</h2>
@@ -761,6 +864,35 @@ export default async function PublicCoursePage({
           </div>
         </aside>
       </div>
+
+      {recommendedCourses.length > 0 && (
+        <section className="border-t border-foreground/10 bg-card/45">
+          <div className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-20">
+            <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-accent">
+              Seguí aprendiendo
+            </p>
+            <h2 className="mt-4 font-display text-5xl leading-none tracking-[-0.04em]">
+              Otros cursos recomendados.
+            </h2>
+            <div className="mt-9 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {recommendedCourses.map((recommendedCourse) => (
+                <CourseTile
+                  key={recommendedCourse.id}
+                  id={recommendedCourse.id}
+                  title={recommendedCourse.title}
+                  description={
+                    recommendedCourse.subtitle || recommendedCourse.description
+                  }
+                  imageUrl={recommendedCourse.imageUrl}
+                  price={recommendedCourse.price}
+                  category={recommendedCourse.category?.name}
+                  chaptersLength={recommendedCourse.chapters.length}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="fixed inset-x-0 bottom-0 z-50 border-t border-foreground/10 bg-background/95 p-3 shadow-[0_-16px_50px_rgba(31,24,19,0.12)] backdrop-blur-xl lg:hidden">
         <div className="mx-auto flex max-w-lg items-center gap-3">

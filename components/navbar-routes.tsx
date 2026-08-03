@@ -1,26 +1,30 @@
 "use client";
 
 import { ArrowLeft, Loader2, LogOut, Settings, User } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
 
-import { SearchInput } from "./search-input";
+const SearchInput = dynamic(
+  () => import("./search-input").then((module) => module.SearchInput),
+  { ssr: false },
+);
 
 interface NavbarRoutesProps {
   canAccessAdmin?: boolean;
   isAuthenticated?: boolean;
+  userName?: string | null;
 }
 
 export const NavbarRoutes = ({
   canAccessAdmin = false,
   isAuthenticated = false,
+  userName,
 }: NavbarRoutesProps) => {
   const pathname = usePathname();
-  const { data: session } = authClient.useSession();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const isAdminPage = pathname?.startsWith("/admin");
@@ -29,14 +33,22 @@ export const NavbarRoutes = ({
 
   const onSignOut = async () => {
     setIsSigningOut(true);
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          window.location.assign("/");
-        },
-      },
-    });
-    setIsSigningOut(false);
+
+    try {
+      const response = await fetch("/api/auth/sign-out", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      });
+
+      if (!response.ok) {
+        throw new Error("No se pudo cerrar la sesión");
+      }
+
+      window.location.assign("/");
+    } finally {
+      setIsSigningOut(false);
+    }
   };
 
   return (
@@ -85,14 +97,14 @@ export const NavbarRoutes = ({
               onClick={onSignOut}
               disabled={isSigningOut}
               className="rounded-full"
-              title={session?.user.name || "Cerrar sesión"}
+              title={userName || "Cerrar sesión"}
             >
               {isSigningOut ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <>
                   <User className="h-4 w-4 sm:mr-2" />
-                  <span className="hidden sm:inline">{session?.user.name || "Mi cuenta"}</span>
+                  <span className="hidden sm:inline">{userName || "Mi cuenta"}</span>
                   <LogOut className="ml-2 hidden h-4 w-4 sm:block" />
                 </>
               )}

@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -54,6 +55,8 @@ export async function POST(
         position: newPosition,
       }
     });
+
+    revalidateTag("courses");
 
     return NextResponse.json(chapter);
   } catch (error) {

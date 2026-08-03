@@ -1,5 +1,4 @@
 import { Menu } from "lucide-react";
-import { Chapter, Course, UserProgress } from "@prisma/client";
 
 import {
   Sheet,
@@ -8,18 +7,17 @@ import {
 } from "@/components/ui/sheet";
 
 import { CourseSidebar } from "./course-sidebar";
+import type { CourseNavigationData } from "./course-sidebar";
 
 interface CourseMobileSidebarProps {
-  course: Course & {
-    chapters: (Chapter & {
-      userProgress: UserProgress[] | null;
-    })[];
-  };
+  course: CourseNavigationData;
+  hasAccess: boolean;
   progressCount: number;
 };
 
 export const CourseMobileSidebar = ({ 
   course,
+  hasAccess,
   progressCount,
 }: CourseMobileSidebarProps) => {
   return (
@@ -30,6 +28,7 @@ export const CourseMobileSidebar = ({
       <SheetContent side="left" className="p-0 bg-white w-72">
         <CourseSidebar
           course={course}
+          hasAccess={hasAccess}
           progressCount={progressCount}
         />
       </SheetContent>

@@ -1,35 +1,34 @@
-import { Chapter, Course, UserProgress } from "@prisma/client"
-
 import { NavbarRoutes } from "@/components/navbar-routes";
 
 import { CourseMobileSidebar } from "./course-mobile-sidebar";
-import { isAdmin } from "@/lib/admin";
-import { getCurrentUser } from "@/lib/session";
+import type { CourseNavigationData } from "./course-sidebar";
 
 interface CourseNavbarProps {
-  course: Course & {
-    chapters: (Chapter & {
-      userProgress: UserProgress[] | null;
-    })[];
-  };
+  canAccessAdmin: boolean;
+  course: CourseNavigationData;
+  hasAccess: boolean;
   progressCount: number;
+  userName: string;
 };
 
-export const CourseNavbar = async ({
+export const CourseNavbar = ({
+  canAccessAdmin,
   course,
+  hasAccess,
   progressCount,
+  userName,
 }: CourseNavbarProps) => {
-  const user = await getCurrentUser();
-
   return (
     <div className="flex h-full items-center border-b border-foreground/10 bg-background/90 p-4 backdrop-blur-xl">
       <CourseMobileSidebar
         course={course}
+        hasAccess={hasAccess}
         progressCount={progressCount}
       />
       <NavbarRoutes
-        canAccessAdmin={isAdmin(user)}
-        isAuthenticated={Boolean(user)}
+        canAccessAdmin={canAccessAdmin}
+        isAuthenticated
+        userName={userName}
       />
     </div>
   )

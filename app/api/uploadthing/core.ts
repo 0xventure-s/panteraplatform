@@ -1,6 +1,7 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 
 import { getAdminUserId } from "@/lib/admin";
+import { getCurrentUserId } from "@/lib/session";
  
 const f = createUploadthing();
  
@@ -11,7 +12,17 @@ const handleAuth = async () => {
   return { userId };
 }
 
+const handleProfileAuth = async () => {
+  const userId = await getCurrentUserId();
+
+  if (!userId) throw new Error("No autorizado");
+  return { userId };
+};
+
 export const ourFileRouter = {
+  profileImage: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
+    .middleware(() => handleProfileAuth())
+    .onUploadComplete(() => {}),
   courseImage: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
     .middleware(() => handleAuth())
     .onUploadComplete(() => {}),

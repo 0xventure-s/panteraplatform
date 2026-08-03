@@ -1,6 +1,5 @@
 "use client";
 
-import axios from "axios";
 import { CheckCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -30,9 +29,18 @@ export const CourseProgressButton = ({
     try {
       setIsLoading(true);
 
-      await axios.put(`/api/courses/${courseId}/chapters/${chapterId}/progress`, {
-        isCompleted: !isCompleted
-      });
+      const response = await fetch(
+        `/api/courses/${courseId}/chapters/${chapterId}/progress`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ isCompleted: !isCompleted }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("No pudimos actualizar el progreso");
+      }
 
       if (!isCompleted && !nextChapterId) {
         confetti.onOpen();

@@ -41,6 +41,7 @@ export const CourseCard = ({
         <div className="relative aspect-video w-full overflow-hidden rounded-[16px] bg-foreground">
           <Image
             fill
+            sizes="(min-width: 1536px) 22vw, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 100vw"
             className="object-cover"
             alt={title}
             src={imageUrl || "/thiings/kiwi.png"}

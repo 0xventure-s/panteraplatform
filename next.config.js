@@ -1,9 +1,27 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  compress: true,
+  poweredByHeader: false,
   images: {
-    domains: [
-      "utfs.io"
-    ]
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 60 * 60 * 24 * 7,
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "utfs.io",
+      },
+      {
+        protocol: "https",
+        hostname: "**.ufs.sh",
+      },
+    ],
+  },
+  experimental: {
+    optimizePackageImports: [
+      "@hello-pangea/dnd",
+      "lucide-react",
+      "recharts",
+    ],
   },
   async redirects() {
     return [
@@ -52,6 +70,6 @@ const nextConfig = {
       },
     ];
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

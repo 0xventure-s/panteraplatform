@@ -1,4 +1,5 @@
 import Mux from "@mux/mux-node";
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -95,6 +96,8 @@ export async function DELETE(
         }
       });
     }
+
+    revalidateTag("courses");
 
     return NextResponse.json(deletedChapter);
   } catch (error) {
@@ -210,6 +213,8 @@ export async function PATCH(
         });
       }
     }
+
+    revalidateTag("courses");
 
     return NextResponse.json(chapter);
   } catch (error) {

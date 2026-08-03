@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import toast from "react-hot-toast";
 
+import { ProfileAvatar } from "@/components/community/profile-avatar";
+import { FileUpload } from "@/components/file-upload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +20,9 @@ interface EditableLink {
 
 interface ProfileEditorProps {
   profile: {
+    id: string;
     name: string;
+    image: string | null;
     headline: string | null;
     bio: string | null;
     location: string | null;
@@ -29,6 +33,7 @@ interface ProfileEditorProps {
 export const ProfileEditor = ({ profile }: ProfileEditorProps) => {
   const router = useRouter();
   const [name, setName] = useState(profile.name);
+  const [image, setImage] = useState(profile.image ?? "");
   const [headline, setHeadline] = useState(profile.headline ?? "");
   const [bio, setBio] = useState(profile.bio ?? "");
   const [location, setLocation] = useState(profile.location ?? "");
@@ -66,7 +71,7 @@ export const ProfileEditor = ({ profile }: ProfileEditorProps) => {
       const response = await fetch("/api/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, headline, bio, location, links }),
+        body: JSON.stringify({ name, image, headline, bio, location, links }),
       });
       const result = (await response.json()) as { message?: string };
 
@@ -89,6 +94,37 @@ export const ProfileEditor = ({ profile }: ProfileEditorProps) => {
 
   return (
     <form onSubmit={onSubmit} className="space-y-7">
+      <div className="grid gap-6 rounded-[24px] border border-foreground/10 bg-background p-5 sm:grid-cols-[112px_1fr] sm:items-center">
+        <ProfileAvatar
+          userId={profile.id}
+          name={name || profile.name}
+          image={image}
+          className="h-28 w-28 text-2xl"
+        />
+        <div className="min-w-0">
+          <Label>Foto de perfil</Label>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">
+            También aparece en el ranking y en los cursos que dictás.
+          </p>
+          <div className="mt-4">
+            <FileUpload
+              endpoint="profileImage"
+              onChange={(url) => setImage(url ?? "")}
+            />
+          </div>
+          {image && (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setImage("")}
+              className="mt-2 rounded-full px-3 text-muted-foreground"
+            >
+              Quitar foto
+            </Button>
+          )}
+        </div>
+      </div>
+
       <div className="grid gap-5 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="profile-name">Nombre público</Label>

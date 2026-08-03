@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { PaymentStatus } from "@prisma/client";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
@@ -187,6 +188,7 @@ export async function POST(request: NextRequest) {
           },
         }),
       ]);
+      revalidateTag("community-leaderboard");
     } else if (status === PaymentStatus.REFUNDED) {
       await db.$transaction([
         db.payment.update({
@@ -201,6 +203,7 @@ export async function POST(request: NextRequest) {
           where: { paymentId: payment.id },
         }),
       ]);
+      revalidateTag("community-leaderboard");
     } else {
       await db.payment.update({
         where: { id: payment.id },

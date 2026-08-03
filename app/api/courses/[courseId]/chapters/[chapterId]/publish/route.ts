@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
@@ -27,18 +28,17 @@ export async function PATCH(
       return new NextResponse("No autorizado", { status: 401 });
     }
 
-    const chapter = await db.chapter.findUnique({
-      where: {
-        id: chapterId,
-        courseId,
-      }
-    });
-
-    const muxData = await db.muxData.findUnique({
-      where: {
-        chapterId,
-      }
-    });
+    const [chapter, muxData] = await Promise.all([
+      db.chapter.findUnique({
+        where: {
+          id: chapterId,
+          courseId,
+        },
+      }),
+      db.muxData.findUnique({
+        where: { chapterId },
+      }),
+    ]);
 
     if (
       !chapter ||
@@ -61,6 +61,8 @@ export async function PATCH(
         isPublished: true,
       }
     });
+
+    revalidateTag("courses");
 
     return NextResponse.json(publishedChapter);
   } catch (error) {

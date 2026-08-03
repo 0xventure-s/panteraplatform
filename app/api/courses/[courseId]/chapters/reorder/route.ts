@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
@@ -15,7 +16,13 @@ export async function PUT(
       return new NextResponse("No autorizado", { status: 401 });
     }
 
-    const { list } = await req.json();
+    const { list } = (await req.json()) as {
+      list?: Array<{ id: string; position: number }>;
+    };
+
+    if (!Array.isArray(list)) {
+      return new NextResponse("El orden no es válido", { status: 400 });
+    }
 
     const ownCourse = await db.course.findUnique({
       where: {
@@ -28,12 +35,16 @@ export async function PUT(
       return new NextResponse("No autorizado", { status: 401 });
     }
 
-    for (const item of list) {
-      await db.chapter.update({
-        where: { id: item.id, courseId },
-        data: { position: item.position }
-      });
-    }
+    await db.$transaction(
+      list.map((item) =>
+        db.chapter.update({
+          where: { id: item.id, courseId },
+          data: { position: item.position },
+        }),
+      ),
+    );
+
+    revalidateTag("courses");
 
     return new NextResponse("Orden actualizado", { status: 200 });
   } catch (error) {

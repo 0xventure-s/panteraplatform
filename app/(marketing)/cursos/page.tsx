@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { unstable_cache } from "next/cache";
 
 import { CourseTile } from "@/components/marketing/course-tile";
 import { db } from "@/lib/db";
@@ -8,18 +9,39 @@ export const metadata: Metadata = {
   description: "Cursos de IA aplicados a la construcción de productos.",
 };
 
-export default async function CoursesPage() {
-  const courses = await db.course.findMany({
-    where: { isPublished: true },
-    include: {
-      category: true,
-      chapters: {
-        where: { isPublished: true },
-        select: { id: true },
+const getPublicCourses = unstable_cache(
+  async () => {
+    const courses = await db.course.findMany({
+      where: { isPublished: true },
+      select: {
+        id: true,
+        title: true,
+        subtitle: true,
+        description: true,
+        imageUrl: true,
+        price: true,
+        category: {
+          select: { name: true },
+        },
+        chapters: {
+          where: { isPublished: true },
+          select: { id: true },
+        },
       },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+      orderBy: { createdAt: "desc" },
+    });
+
+    return courses.map((course) => ({
+      ...course,
+      price: course.price?.toString() ?? null,
+    }));
+  },
+  ["public-courses-v2"],
+  { revalidate: 60, tags: ["courses"] },
+);
+
+export default async function CoursesPage() {
+  const courses = await getPublicCourses();
 
   return (
     <main className="mx-auto min-h-[calc(100vh-80px)] max-w-7xl px-5 py-16 lg:px-8 lg:py-24">

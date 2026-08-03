@@ -1,6 +1,5 @@
 "use client";
 
-import axios from "axios";
 import MuxPlayer from "@mux/mux-player-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
@@ -36,9 +35,18 @@ export const VideoPlayer = ({
   const onEnd = async () => {
     try {
       if (completeOnEnd) {
-        await axios.put(`/api/courses/${courseId}/chapters/${chapterId}/progress`, {
-          isCompleted: true,
-        });
+        const response = await fetch(
+          `/api/courses/${courseId}/chapters/${chapterId}/progress`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ isCompleted: true }),
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("No pudimos guardar el progreso");
+        }
 
         if (!nextChapterId) {
           confetti.onOpen();

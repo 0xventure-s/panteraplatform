@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
@@ -54,6 +55,8 @@ export async function PATCH(
         }
       });
     }
+
+    revalidateTag("courses");
 
     return NextResponse.json(unpublishedChapter);
   } catch (error) {

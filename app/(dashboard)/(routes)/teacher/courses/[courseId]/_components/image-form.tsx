@@ -76,6 +76,7 @@ export const ImageForm = ({
             <Image
               alt={`Portada de ${initialData.title}`}
               fill
+              sizes="(min-width: 1024px) 45vw, 100vw"
               className="object-cover rounded-md"
               src={initialData.imageUrl}
             />

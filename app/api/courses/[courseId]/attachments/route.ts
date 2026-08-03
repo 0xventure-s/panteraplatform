@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
@@ -34,6 +35,8 @@ export async function POST(
         courseId,
       }
     });
+
+    revalidateTag("courses");
 
     return NextResponse.json(attachment);
   } catch (error) {

@@ -1,16 +1,8 @@
-import { Category, Course } from "@prisma/client";
-
+import type { CourseListItem } from "@/actions/get-courses";
 import { CourseCard } from "@/components/course-card";
 
-type CourseWithProgressWithCategory = Course & {
-  category: Category | null;
-  chapters: { id: string }[];
-  progress: number | null;
-  nextChapterId?: string;
-};
-
 interface CoursesListProps {
-  items: CourseWithProgressWithCategory[];
+  items: CourseListItem[];
   emptyState?: string;
 }
 

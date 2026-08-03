@@ -1,6 +1,5 @@
 "use client"
 
-import { Course } from "@prisma/client"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, MoreHorizontal, Pencil } from "lucide-react"
 import Link from "next/link";
@@ -16,7 +15,14 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/format";
 
-export const columns: ColumnDef<Course>[] = [
+export interface CourseTableRow {
+  id: string;
+  title: string;
+  price: number | null;
+  isPublished: boolean;
+}
+
+export const columns: ColumnDef<CourseTableRow>[] = [
   {
     accessorKey: "title",
     header: ({ column }) => {

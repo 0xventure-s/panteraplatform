@@ -1,40 +1,29 @@
-import { Chapter, Course, UserProgress } from "@prisma/client"
-import { redirect } from "next/navigation";
-
-import { db } from "@/lib/db";
 import { CourseProgress } from "@/components/course-progress";
 
 import { CourseSidebarItem } from "./course-sidebar-item";
-import { getCurrentUserId } from "@/lib/session";
+
+export interface CourseNavigationData {
+  id: string;
+  title: string;
+  chapters: Array<{
+    id: string;
+    title: string;
+    isFree: boolean;
+    userProgress: Array<{ isCompleted: boolean }>;
+  }>;
+}
 
 interface CourseSidebarProps {
-  course: Course & {
-    chapters: (Chapter & {
-      userProgress: UserProgress[] | null;
-    })[]
-  };
+  course: CourseNavigationData;
+  hasAccess: boolean;
   progressCount: number;
 };
 
-export const CourseSidebar = async ({
+export const CourseSidebar = ({
   course,
+  hasAccess,
   progressCount,
 }: CourseSidebarProps) => {
-  const userId = await getCurrentUserId();
-
-  if (!userId) {
-    return redirect("/sign-in");
-  }
-
-  const purchase = await db.purchase.findUnique({
-    where: {
-      userId_courseId: {
-        userId,
-        courseId: course.id,
-      }
-    }
-  });
-
   return (
     <div className="flex h-full flex-col overflow-y-auto border-r border-foreground/10 bg-card">
       <div className="flex flex-col border-b border-foreground/10 p-7">
@@ -42,7 +31,7 @@ export const CourseSidebar = async ({
         <h1 className="mt-3 text-xl font-extrabold leading-tight tracking-[-0.03em]">
           {course.title}
         </h1>
-        {purchase && (
+        {hasAccess && (
           <div className="mt-7">
             <CourseProgress
               variant="success"
@@ -59,7 +48,7 @@ export const CourseSidebar = async ({
             label={chapter.title}
             isCompleted={!!chapter.userProgress?.[0]?.isCompleted}
             courseId={course.id}
-            isLocked={!chapter.isFree && !purchase}
+            isLocked={!chapter.isFree && !hasAccess}
           />
         ))}
       </div>

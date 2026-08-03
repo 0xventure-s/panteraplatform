@@ -37,6 +37,7 @@ model ProfileLink {
 
   @@unique([userId, url])
   @@index([userId])
+  @@index([userId, position])
 }
 
 model Session {
@@ -117,6 +118,9 @@ model Course {
   updatedAt DateTime @updatedAt
 
   @@index([categoryId])
+  @@index([isPublished, createdAt])
+  @@index([isPublished, updatedAt])
+  @@index([isPublished, categoryId, createdAt])
 }
 
 model Category {
@@ -162,6 +166,7 @@ model Chapter {
   updatedAt DateTime @updatedAt
 
   @@index([courseId])
+  @@index([courseId, isPublished, position])
 }
 
 model CourseFaq {
@@ -195,6 +200,7 @@ model CourseReview {
 
   @@unique([userId, courseId])
   @@index([courseId])
+  @@index([courseId, updatedAt])
 }
 
 model MuxData {
@@ -220,6 +226,7 @@ model UserProgress {
 
   @@unique([userId, chapterId])
   @@index([chapterId])
+  @@index([userId, isCompleted])
 }
 
 model Purchase {
@@ -237,6 +244,7 @@ model Purchase {
 
   @@unique([userId, courseId])
   @@index([courseId])
+  @@index([userId, createdAt])
 }
 
 enum PaymentStatus {
@@ -269,6 +277,7 @@ model Payment {
   @@index([userId])
   @@index([courseId])
   @@index([status])
+  @@index([status, courseId])
 }
 
 model MercadoPagoConnection {

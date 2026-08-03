@@ -1,5 +1,7 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
+
 import { db } from "@/lib/db";
 
 export interface LeaderboardEntry {
@@ -52,7 +54,7 @@ export interface CommunityProfile {
 const percentage = (completed: number, total: number) =>
   total > 0 ? Math.round((completed / total) * 100) : 0;
 
-export const getLeaderboard = async (): Promise<LeaderboardEntry[]> => {
+const loadLeaderboard = async (): Promise<LeaderboardEntry[]> => {
   const purchases = await db.purchase.findMany({
     select: {
       userId: true,
@@ -170,67 +172,75 @@ export const getLeaderboard = async (): Promise<LeaderboardEntry[]> => {
     .map((entry, index) => ({ ...entry, position: index + 1 }));
 };
 
+export const getLeaderboard = unstable_cache(
+  loadLeaderboard,
+  ["community-leaderboard-v1"],
+  {
+    revalidate: 60,
+    tags: ["community-leaderboard"],
+  },
+);
+
 export const getCommunityProfile = async (
   userId: string,
 ): Promise<CommunityProfile | null> => {
-  const user = await db.user.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      name: true,
-      image: true,
-      headline: true,
-      bio: true,
-      location: true,
-      createdAt: true,
-      profileLinks: {
-        orderBy: [{ position: "asc" }, { createdAt: "asc" }],
-        select: { id: true, label: true, url: true },
+  const [user, purchases] = await Promise.all([
+    db.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        headline: true,
+        bio: true,
+        location: true,
+        createdAt: true,
+        profileLinks: {
+          orderBy: [{ position: "asc" }, { createdAt: "asc" }],
+          select: { id: true, label: true, url: true },
+        },
       },
-    },
-  });
+    }),
+    db.purchase.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        createdAt: true,
+        course: {
+          select: {
+            id: true,
+            title: true,
+            imageUrl: true,
+            category: { select: { name: true } },
+            chapters: {
+              where: { isPublished: true },
+              orderBy: { position: "asc" },
+              select: {
+                id: true,
+                userProgress: {
+                  where: { userId, isCompleted: true },
+                  select: { id: true },
+                  take: 1,
+                },
+              },
+            },
+          },
+        },
+      },
+    }),
+  ]);
 
   if (!user) {
     return null;
   }
 
-  const purchases = await db.purchase.findMany({
-    where: { userId },
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      createdAt: true,
-      course: {
-        select: {
-          id: true,
-          title: true,
-          imageUrl: true,
-          category: { select: { name: true } },
-          chapters: {
-            where: { isPublished: true },
-            orderBy: { position: "asc" },
-            select: { id: true },
-          },
-        },
-      },
-    },
-  });
-
-  const chapterIds = purchases.flatMap((purchase) =>
-    purchase.course.chapters.map((chapter) => chapter.id),
-  );
-  const completedProgress = chapterIds.length
-    ? await db.userProgress.findMany({
-        where: {
-          userId,
-          chapterId: { in: chapterIds },
-          isCompleted: true,
-        },
-        select: { chapterId: true },
-      })
-    : [];
   const completedChapterIds = new Set(
-    completedProgress.map((progress) => progress.chapterId),
+    purchases.flatMap((purchase) =>
+      purchase.course.chapters
+        .filter((chapter) => chapter.userProgress.length > 0)
+        .map((chapter) => chapter.id),
+    ),
   );
 
   const profilePurchases = purchases.map((purchase) => {

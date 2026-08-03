@@ -29,38 +29,38 @@ const CourseIdPage = async ({
     return redirect("/dashboard");
   }
 
-  const course = await db.course.findUnique({
-    where: {
-      id: courseId,
-      userId
-    },
-    include: {
-      chapters: {
-        include: {
-          muxData: true,
+  const [course, categories] = await Promise.all([
+    db.course.findUnique({
+      where: {
+        id: courseId,
+        userId,
+      },
+      include: {
+        chapters: {
+          include: {
+            muxData: true,
+          },
+          orderBy: {
+            position: "asc",
+          },
         },
-        orderBy: {
-          position: "asc",
+        attachments: {
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
+        faqs: {
+          orderBy: {
+            position: "asc",
+          },
         },
       },
-      attachments: {
-        orderBy: {
-          createdAt: "desc",
-        },
-      },
-      faqs: {
-        orderBy: {
-          position: "asc",
-        },
-      },
-    },
-  });
-
-  const categories = await db.category.findMany({
-    orderBy: {
-      name: "asc",
-    },
-  });
+    }),
+    db.category.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+  ]);
 
   if (!course) {
     return redirect("/admin/cursos");

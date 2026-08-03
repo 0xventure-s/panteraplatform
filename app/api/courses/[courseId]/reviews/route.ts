@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -49,6 +50,8 @@ export async function PUT(
       },
       update: input.data,
     });
+
+    revalidateTag("courses");
 
     return NextResponse.json(review);
   } catch (error) {

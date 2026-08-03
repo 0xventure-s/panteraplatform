@@ -1,6 +1,5 @@
 "use client";
 
-import axios from "axios";
 import { Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -35,12 +34,23 @@ export const CourseReviewForm = ({
 
     try {
       setIsSaving(true);
-      await axios.put(`/api/courses/${courseId}/reviews`, { rating, comment });
+      const response = await fetch(`/api/courses/${courseId}/reviews`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating, comment }),
+      });
+
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
       toast.success(initialReview ? "Opinión actualizada" : "Gracias por compartir tu experiencia");
       router.refresh();
     } catch (error) {
-      const message = axios.isAxiosError(error) ? error.response?.data : null;
-      toast.error(typeof message === "string" ? message : "No pudimos guardar tu opinión");
+      toast.error(
+        error instanceof Error && error.message
+          ? error.message
+          : "No pudimos guardar tu opinión",
+      );
     } finally {
       setIsSaving(false);
     }

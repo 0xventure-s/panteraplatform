@@ -1,6 +1,5 @@
 "use client";
 
-import axios from "axios";
 import Image from "next/image";
 import { ArrowUpRight, Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -23,14 +22,23 @@ export const CourseEnrollButton = ({
     try {
       setIsLoading(true);
 
-      const response = await axios.post(`/api/courses/${courseId}/checkout`);
+      const response = await fetch(`/api/courses/${courseId}/checkout`, {
+        method: "POST",
+      });
+      const result = (await response.json()) as {
+        error?: string;
+        url?: string;
+      };
 
-      window.location.assign(response.data.url);
+      if (!response.ok || !result.url) {
+        throw new Error(result.error || "No pudimos iniciar el pago");
+      }
+
+      window.location.assign(result.url);
     } catch (error) {
-      const message = axios.isAxiosError(error)
-        ? error.response?.data?.error
-        : null;
-      toast.error(message || "No pudimos iniciar el pago");
+      toast.error(
+        error instanceof Error ? error.message : "No pudimos iniciar el pago",
+      );
     } finally {
       setIsLoading(false);
     }

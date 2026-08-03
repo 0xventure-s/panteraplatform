@@ -17,19 +17,20 @@ interface SearchPageProps {
 }
 
 const SearchPage = async ({ searchParams }: SearchPageProps) => {
-  const query = await searchParams;
-  const userId = await getCurrentUserId();
-
-  const categories = await db.category.findMany({
-    orderBy: {
-      name: "asc",
-    },
-  });
-
-  const courses = await getCourses({
-    userId,
-    ...query,
-  });
+  const [query, userId] = await Promise.all([
+    searchParams,
+    getCurrentUserId(),
+  ]);
+  const [categories, courses] = await Promise.all([
+    db.category.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+    getCourses({
+      userId,
+      ...query,
+    }),
+  ]);
 
   return (
     <div className="mx-auto max-w-7xl space-y-10 p-4 sm:p-6 md:p-8 lg:p-10">

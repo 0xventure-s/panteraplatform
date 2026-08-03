@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getAnalytics } from "@/actions/get-analytics";
 
 import { DataCard } from "./_components/data-card";
-import { Chart } from "./_components/chart";
+import { LazyChart } from "./_components/lazy-chart";
 import { getAdminUserId } from "@/lib/admin";
 
 const AnalyticsPage = async () => {
@@ -39,7 +39,7 @@ const AnalyticsPage = async () => {
           icon="credit-card"
         />
       </div>
-      <Chart
+      <LazyChart
         data={data}
       />
     </div>

@@ -1,4 +1,4 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -12,9 +12,24 @@ const nullableText = (maxLength: number) =>
     .max(maxLength)
     .transform((value) => value || null);
 
+const profileImage = nullableText(2048).refine(
+  (value) =>
+    !value ||
+    value.startsWith("/") ||
+    (() => {
+      try {
+        return new URL(value).protocol === "https:";
+      } catch {
+        return false;
+      }
+    })(),
+  "La foto de perfil no es válida.",
+);
+
 const profileSchema = z
   .object({
     name: z.string().trim().min(2).max(80),
+    image: profileImage,
     headline: nullableText(120),
     bio: nullableText(600),
     location: nullableText(80),
@@ -67,6 +82,7 @@ export async function PATCH(request: Request) {
         where: { id: userId },
         data: {
           name: profile.name,
+          image: profile.image,
           headline: profile.headline,
           bio: profile.bio,
           location: profile.location,
@@ -89,6 +105,8 @@ export async function PATCH(request: Request) {
     revalidatePath("/ranking");
     revalidatePath("/perfil");
     revalidatePath(`/perfil/${userId}`);
+    revalidatePath("/cursos/[courseId]", "page");
+    revalidateTag("community-leaderboard");
 
     return NextResponse.json({ message: "Perfil actualizado." });
   } catch (error) {

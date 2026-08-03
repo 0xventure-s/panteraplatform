@@ -222,6 +222,7 @@ export const ProfileView = ({ profile, canEdit, rank }: ProfileViewProps) => (
                       src={purchase.course.imageUrl}
                       alt=""
                       fill
+                      sizes="(min-width: 640px) 150px, 100vw"
                       className="object-cover"
                     />
                   ) : (
