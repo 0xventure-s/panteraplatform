@@ -289,29 +289,25 @@ export default async function PublicCoursePage({
       />
 
       <section className="relative isolate overflow-hidden bg-[#0d0b09] text-[#f8f4ea]">
-        {course.imageUrl && (
-          <>
-            <div className="absolute -inset-20" aria-hidden="true">
-              <Image
-                src={course.imageUrl}
-                alt=""
-                fill
-                priority
-                sizes="100vw"
-                className="scale-125 object-cover object-center brightness-[0.78] saturate-[1.28] blur-[52px]"
-              />
-            </div>
-            <div className="absolute -inset-8 opacity-20" aria-hidden="true">
-              <Image
-                src={course.imageUrl}
-                alt=""
-                fill
-                sizes="100vw"
-                className="scale-110 object-cover object-center saturate-[1.12] blur-[16px]"
-              />
-            </div>
-          </>
-        )}
+        <div className="absolute -inset-20" aria-hidden="true">
+          <Image
+            src="/ai-learning-hero-v2.png"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="scale-125 object-cover object-center brightness-[0.78] saturate-[1.28] blur-[52px]"
+          />
+        </div>
+        <div className="absolute -inset-8 opacity-20" aria-hidden="true">
+          <Image
+            src="/ai-learning-hero-v2.png"
+            alt=""
+            fill
+            sizes="100vw"
+            className="scale-110 object-cover object-center saturate-[1.12] blur-[16px]"
+          />
+        </div>
         <div
           className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,8,7,0.88)_0%,rgba(10,8,7,0.62)_48%,rgba(10,8,7,0.28)_100%)]"
           aria-hidden="true"
