@@ -9,7 +9,10 @@ const updateChapterSchema = z.object({
   title: z.string().trim().min(1).max(160).optional(),
   description: z.string().min(1).optional(),
   videoUrl: z.string().min(1).optional(),
+  moduleTitle: z.string().trim().max(120).nullable().optional(),
+  durationMinutes: z.coerce.number().int().positive().max(10000).nullable().optional(),
   isFree: z.boolean().optional(),
+  isTrailer: z.boolean().optional(),
 }).strict();
 
 const { Video } = new Mux(
@@ -82,7 +85,7 @@ export async function DELETE(
       }
     });
 
-    if (!publishedChaptersInCourse.length) {
+    if (!publishedChaptersInCourse.length || chapter.isTrailer) {
       await db.course.update({
         where: {
           id: courseId,
@@ -130,15 +133,34 @@ export async function PATCH(
       return new NextResponse("No autorizado", { status: 401 });
     }
 
-    const chapter = await db.chapter.update({
-      where: {
-        id: chapterId,
-        courseId,
-      },
-      data: {
-        ...values,
-      }
-    });
+    const chapter = values.isTrailer
+      ? await db.$transaction(async (transaction) => {
+          await transaction.chapter.updateMany({
+            where: {
+              courseId,
+              id: { not: chapterId },
+            },
+            data: { isTrailer: false },
+          });
+
+          return transaction.chapter.update({
+            where: {
+              id: chapterId,
+              courseId,
+            },
+            data: {
+              ...values,
+              isFree: true,
+            },
+          });
+        })
+      : await db.chapter.update({
+          where: {
+            id: chapterId,
+            courseId,
+          },
+          data: values,
+        });
 
     if (values.videoUrl) {
       const existingMuxData = await db.muxData.findFirst({
@@ -169,6 +191,24 @@ export async function PATCH(
           playbackId: asset.playback_ids?.[0]?.id,
         }
       });
+    }
+
+    if (values.isTrailer === false) {
+      const publishedTrailer = await db.chapter.findFirst({
+        where: {
+          courseId,
+          isPublished: true,
+          isTrailer: true,
+        },
+        select: { id: true },
+      });
+
+      if (!publishedTrailer) {
+        await db.course.update({
+          where: { id: courseId },
+          data: { isPublished: false },
+        });
+      }
     }
 
     return NextResponse.json(chapter);

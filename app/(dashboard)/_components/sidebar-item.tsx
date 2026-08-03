@@ -1,18 +1,18 @@
 "use client";
 
-import { LucideIcon } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
+import { ThreeDIcon, type ThreeDIconName } from "@/components/three-d-icon";
 import { cn } from "@/lib/utils";
 
 interface SidebarItemProps {
-  icon: LucideIcon;
+  icon: ThreeDIconName;
   label: string;
   href: string;
-};
+}
 
 export const SidebarItem = ({
-  icon: Icon,
+  icon,
   label,
   href,
 }: SidebarItemProps) => {
@@ -25,27 +25,32 @@ export const SidebarItem = ({
 
   const onClick = () => {
     router.push(href);
-  }
+  };
 
   return (
     <button
       onClick={onClick}
       type="button"
       className={cn(
-        "mx-3 flex items-center gap-x-2 rounded-xl pl-3 text-sm font-bold text-muted-foreground transition-all hover:bg-muted hover:text-foreground",
+        "mx-3 flex min-h-12 items-center rounded-2xl px-3 text-left text-sm font-bold text-muted-foreground transition-all hover:bg-muted hover:text-foreground",
         isActive && "bg-foreground text-background hover:bg-foreground hover:text-background"
       )}
     >
-      <div className="flex items-center gap-x-3 py-3">
-        <Icon
-          size={22}
+      <div className="flex flex-1 items-center gap-x-3 py-2">
+        <span
           className={cn(
-            "text-muted-foreground",
-            isActive && "text-secondary"
+            "grid h-9 w-9 shrink-0 place-items-center transition-transform",
+            isActive && "scale-110"
           )}
-        />
+        >
+          <ThreeDIcon
+            name={icon}
+            size={29}
+            className={cn("transition-transform", isActive && "scale-110")}
+          />
+        </span>
         {label}
       </div>
     </button>
-  )
-}
+  );
+};

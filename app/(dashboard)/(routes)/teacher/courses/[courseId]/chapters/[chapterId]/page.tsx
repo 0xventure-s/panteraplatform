@@ -11,6 +11,7 @@ import { ChapterDescriptionForm } from "./_components/chapter-description-form";
 import { ChapterAccessForm } from "./_components/chapter-access-form";
 import { ChapterVideoForm } from "./_components/chapter-video-form";
 import { ChapterActions } from "./_components/chapter-actions";
+import { ChapterDetailsForm } from "./_components/chapter-details-form";
 import { getAdminUserId } from "@/lib/admin";
 
 const ChapterIdPage = async ({
@@ -43,6 +44,8 @@ const ChapterIdPage = async ({
     chapter.title,
     chapter.description,
     chapter.videoUrl,
+    chapter.moduleTitle,
+    chapter.durationMinutes,
   ];
 
   const totalFields = requiredFields.length;
@@ -103,6 +106,11 @@ const ChapterIdPage = async ({
                 chapterId={chapterId}
               />
               <ChapterDescriptionForm
+                initialData={chapter}
+                courseId={courseId}
+                chapterId={chapterId}
+              />
+              <ChapterDetailsForm
                 initialData={chapter}
                 courseId={courseId}
                 chapterId={chapterId}

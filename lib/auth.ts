@@ -6,18 +6,44 @@ import { after } from "next/server";
 
 import { db } from "@/lib/db";
 import { sendPasswordResetEmail } from "@/lib/email";
+import { getRobotAvatarPath } from "@/lib/profile-avatar";
 
-const appUrl = process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL;
+const normalizeOrigin = (value?: string) => {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    return new URL(value).origin;
+  } catch {
+    return null;
+  }
+};
+
+const appUrl = normalizeOrigin(
+  process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL,
+);
+const trustedOrigins = Array.from(
+  new Set(
+    [
+      normalizeOrigin(process.env.BETTER_AUTH_URL),
+      normalizeOrigin(process.env.NEXT_PUBLIC_APP_URL),
+      ...(process.env.NODE_ENV === "production"
+        ? []
+        : ["http://localhost:3000", "http://127.0.0.1:3000"]),
+    ].filter((origin): origin is string => Boolean(origin)),
+  ),
+);
 const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
 
 export const auth = betterAuth({
   appName: "Franco Alonso",
-  baseURL: appUrl,
+  baseURL: appUrl ?? undefined,
   secret: process.env.BETTER_AUTH_SECRET,
   database: prismaAdapter(db, {
     provider: "postgresql",
   }),
-  trustedOrigins: appUrl ? [appUrl] : [],
+  trustedOrigins,
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 8,
@@ -51,6 +77,7 @@ export const auth = betterAuth({
         before: async (user) => ({
           data: {
             ...user,
+            image: user.image?.trim() || getRobotAvatarPath(user.id || user.email),
             role:
               adminEmail && user.email.toLowerCase() === adminEmail
                 ? "admin"

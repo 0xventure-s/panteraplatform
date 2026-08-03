@@ -27,7 +27,10 @@ export const CourseNavbar = async ({
         course={course}
         progressCount={progressCount}
       />
-      <NavbarRoutes canAccessAdmin={isAdmin(user)} />
+      <NavbarRoutes
+        canAccessAdmin={isAdmin(user)}
+        isAuthenticated={Boolean(user)}
+      />
     </div>
   )
 }

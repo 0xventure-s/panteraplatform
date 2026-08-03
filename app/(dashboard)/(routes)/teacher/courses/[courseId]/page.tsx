@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { CircleDollarSign, File, LayoutDashboard, ListChecks } from "lucide-react";
+import { CircleDollarSign, File, HelpCircle, LayoutDashboard, ListChecks, Target } from "lucide-react";
 
 import { db } from "@/lib/db";
 import { IconBadge } from "@/components/icon-badge";
@@ -13,6 +13,8 @@ import { PriceForm } from "./_components/price-form";
 import { AttachmentForm } from "./_components/attachment-form";
 import { ChaptersForm } from "./_components/chapters-form";
 import { Actions } from "./_components/actions";
+import { CourseFaqsForm } from "./_components/course-faqs-form";
+import { CourseSalesForm } from "./_components/course-sales-form";
 import { getAdminUserId } from "@/lib/admin";
 
 const CourseIdPage = async ({
@@ -34,6 +36,9 @@ const CourseIdPage = async ({
     },
     include: {
       chapters: {
+        include: {
+          muxData: true,
+        },
         orderBy: {
           position: "asc",
         },
@@ -41,6 +46,11 @@ const CourseIdPage = async ({
       attachments: {
         orderBy: {
           createdAt: "desc",
+        },
+      },
+      faqs: {
+        orderBy: {
+          position: "asc",
         },
       },
     },
@@ -62,7 +72,21 @@ const CourseIdPage = async ({
     course.imageUrl,
     course.price,
     course.categoryId,
-    course.chapters.some(chapter => chapter.isPublished),
+    course.subtitle,
+    course.level,
+    course.estimatedMinutes,
+    course.outcomes.length > 0,
+    course.targetAudience.length > 0,
+    course.projectTitle,
+    course.projectDescription,
+    course.faqs.length > 0,
+    course.chapters.some((chapter) => chapter.isPublished),
+    course.chapters.some(
+      (chapter) =>
+        chapter.isPublished &&
+        chapter.isTrailer &&
+        Boolean(chapter.muxData?.playbackId),
+    ),
   ];
 
   const totalFields = requiredFields.length;
@@ -123,6 +147,14 @@ const CourseIdPage = async ({
                 value: category.id,
               }))}
             />
+            <div className="mt-10 flex items-center gap-x-2">
+              <IconBadge icon={Target} />
+              <h2 className="text-xl">Propuesta del curso</h2>
+            </div>
+            <CourseSalesForm
+              initialData={course}
+              courseId={course.id}
+            />
           </div>
           <div className="space-y-6">
             <div>
@@ -158,6 +190,16 @@ const CourseIdPage = async ({
               </div>
               <AttachmentForm
                 initialData={course}
+                courseId={course.id}
+              />
+            </div>
+            <div>
+              <div className="flex items-center gap-x-2">
+                <IconBadge icon={HelpCircle} />
+                <h2 className="text-xl">Preguntas antes de comprar</h2>
+              </div>
+              <CourseFaqsForm
+                initialItems={course.faqs}
                 courseId={course.id}
               />
             </div>

@@ -1,5 +1,5 @@
 import { SiteLogo } from "@/components/site-logo";
 
-export const Logo = () => {
-  return <SiteLogo href="/dashboard" />;
-}
+export const Logo = ({ href = "/dashboard" }: { href?: string }) => {
+  return <SiteLogo href={href} />;
+};

@@ -7,10 +7,20 @@ import { getAdminUserId } from "@/lib/admin";
 
 const updateCourseSchema = z.object({
   title: z.string().trim().min(1).max(160).optional(),
-  description: z.string().min(1).optional(),
-  imageUrl: z.string().min(1).optional(),
-  price: z.coerce.number().positive().optional(),
-  categoryId: z.string().min(1).optional(),
+  subtitle: z.string().trim().max(280).nullable().optional(),
+  description: z.string().min(1).nullable().optional(),
+  imageUrl: z.string().min(1).nullable().optional(),
+  price: z.coerce.number().positive().nullable().optional(),
+  categoryId: z.string().min(1).nullable().optional(),
+  level: z.string().trim().max(80).nullable().optional(),
+  estimatedMinutes: z.coerce.number().int().positive().max(100000).nullable().optional(),
+  outcomes: z.array(z.string().trim().min(1).max(240)).max(12).optional(),
+  targetAudience: z.array(z.string().trim().min(1).max(240)).max(12).optional(),
+  notForAudience: z.array(z.string().trim().min(1).max(240)).max(12).optional(),
+  prerequisites: z.array(z.string().trim().min(1).max(240)).max(12).optional(),
+  projectTitle: z.string().trim().max(180).nullable().optional(),
+  projectDescription: z.string().trim().max(1200).nullable().optional(),
+  projectImageUrl: z.string().min(1).nullable().optional(),
 }).strict();
 
 const { Video } = new Mux(

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-labelledby="title desc">
+  <title id="title">Prototipos con IA</title>
+  <desc id="desc">Composición modular en naranja, rosa y negro.</desc>
+  <rect width="1200" height="750" fill="#ff805f"/>
+  <rect x="760" y="74" width="350" height="602" rx="58" fill="#f8e9dc" stroke="#191715" stroke-width="16"/>
+  <rect x="810" y="150" width="250" height="170" rx="28" fill="#ffcadc"/>
+  <rect x="810" y="354" width="180" height="28" rx="14" fill="#191715"/>
+  <rect x="810" y="410" width="250" height="18" rx="9" fill="#8f8580"/>
+  <rect x="810" y="460" width="250" height="110" rx="28" fill="#ffd95e"/>
+  <rect x="76" y="72" width="118" height="118" rx="30" fill="#191715"/>
+  <text x="135" y="148" text-anchor="middle" fill="#f8e9dc" font-family="Arial, sans-serif" font-size="42" font-weight="800">FA</text>
+  <text x="76" y="310" fill="#191715" font-family="Arial, sans-serif" font-size="82" font-weight="800">PROTOTIPOS</text>
+  <text x="76" y="400" fill="#191715" font-family="Arial, sans-serif" font-size="82" font-weight="800">CON IA</text>
+  <text x="80" y="458" fill="#5b3026" font-family="Arial, sans-serif" font-size="25" font-weight="700" letter-spacing="4">DE HIPÓTESIS A PRUEBA</text>
+</svg>

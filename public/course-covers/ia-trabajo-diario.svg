@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-labelledby="title desc">
+  <title id="title">IA aplicada al trabajo diario</title>
+  <desc id="desc">Composición editorial en verde, crema y negro.</desc>
+  <rect width="1200" height="750" fill="#d8f1d2"/>
+  <path d="M765 0h435v750H765z" fill="#efe9df"/>
+  <path d="M825 120h315v76H825zM825 234h230v76H825zM825 348h315v76H825zM825 462h185v76H825z" fill="#191715"/>
+  <circle cx="1082" cy="615" r="132" fill="#ff7657"/>
+  <rect x="76" y="72" width="118" height="118" rx="30" fill="#191715"/>
+  <text x="135" y="148" text-anchor="middle" fill="#d8f1d2" font-family="Arial, sans-serif" font-size="42" font-weight="800">FA</text>
+  <text x="76" y="298" fill="#191715" font-family="Arial, sans-serif" font-size="82" font-weight="800">IA PARA EL</text>
+  <text x="76" y="388" fill="#191715" font-family="Arial, sans-serif" font-size="82" font-weight="800">DÍA A DÍA</text>
+  <text x="80" y="446" fill="#36733a" font-family="Arial, sans-serif" font-size="25" font-weight="700" letter-spacing="4">CRITERIO, CALIDAD Y SISTEMA</text>
+</svg>

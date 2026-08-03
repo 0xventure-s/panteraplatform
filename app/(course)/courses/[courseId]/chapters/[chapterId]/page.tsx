@@ -5,6 +5,7 @@ import { getChapter } from "@/actions/get-chapter";
 import { Banner } from "@/components/banner";
 import { Separator } from "@/components/ui/separator";
 import { Preview } from "@/components/preview";
+import { toPriceNumber } from "@/lib/format";
 
 import { VideoPlayer } from "./_components/video-player";
 import { CourseEnrollButton } from "./_components/course-enroll-button";
@@ -86,7 +87,7 @@ const ChapterIdPage = async ({
             ) : (
               <CourseEnrollButton
                 courseId={courseId}
-                price={course.price!}
+                price={toPriceNumber(course.price!)}
               />
             )}
           </div>

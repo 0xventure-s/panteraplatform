@@ -1,20 +1,16 @@
 "use client";
 
 import qs from "query-string";
-import { IconType } from "react-icons";
-import { 
-  usePathname, 
-  useRouter, 
-  useSearchParams
-} from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
+import { ThreeDIcon, type ThreeDIconName } from "@/components/three-d-icon";
 import { cn } from "@/lib/utils";
 
 interface CategoryItemProps {
   label: string;
   value?: string;
-  icon?: IconType;
-};
+  icon?: ThreeDIconName;
+}
 
 export const CategoryItem = ({
   label,
@@ -46,15 +42,19 @@ export const CategoryItem = ({
     <button
       onClick={onClick}
       className={cn(
-        "py-2 px-3 text-sm border border-slate-200 rounded-full flex items-center gap-x-1 hover:border-sky-700 transition",
-        isSelected && "border-sky-700 bg-sky-200/20 text-sky-800"
+        "flex shrink-0 items-center gap-2 rounded-full border border-foreground/10 bg-card py-1.5 pl-1.5 pr-4 text-sm font-bold text-muted-foreground transition hover:border-foreground/25 hover:bg-muted hover:text-foreground",
+        isSelected && "border-foreground bg-foreground text-background hover:bg-foreground hover:text-background"
       )}
       type="button"
     >
-      {Icon && <Icon size={20} />}
+      {Icon && (
+        <span className="grid h-8 w-8 place-items-center">
+          <ThreeDIcon name={Icon} size={25} />
+        </span>
+      )}
       <div className="truncate">
         {label}
       </div>
     </button>
-  )
-}
+  );
+};

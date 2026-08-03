@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const publicPathPatterns = [
   /^\/$/,
+  /^\/search$/,
   /^\/cursos(?:\/[^/]+)?$/,
   /^\/pagos\/resultado$/,
   /^\/sign-in(?:\/.*)?$/,

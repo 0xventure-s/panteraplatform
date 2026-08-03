@@ -44,7 +44,7 @@ export async function PATCH(
       }
     });
 
-    if (!publishedChaptersInCourse.length) {
+    if (!publishedChaptersInCourse.length || unpublishedChapter.isTrailer) {
       await db.course.update({
         where: {
           id: courseId,

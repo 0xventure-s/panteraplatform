@@ -29,6 +29,7 @@ interface ChapterAccessFormProps {
 
 const formSchema = z.object({
   isFree: z.boolean().default(false),
+  isTrailer: z.boolean().default(false),
 });
 
 export const ChapterAccessForm = ({
@@ -45,7 +46,8 @@ export const ChapterAccessForm = ({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      isFree: !!initialData.isFree
+      isFree: !!initialData.isFree,
+      isTrailer: !!initialData.isTrailer,
     },
   });
 
@@ -78,16 +80,16 @@ export const ChapterAccessForm = ({
         </Button>
       </div>
       {!isEditing && (
-        <p className={cn(
-          "text-sm mt-2",
-          !initialData.isFree && "text-slate-500 italic"
-        )}>
-          {initialData.isFree ? (
-            <>Disponible como vista previa gratuita.</>
-          ) : (
-            <>Disponible únicamente con la compra del curso.</>
+        <div className="mt-2 space-y-1 text-sm">
+          <p className={cn(!initialData.isFree && "italic text-slate-500")}>
+            {initialData.isFree
+              ? "Disponible como vista previa gratuita."
+              : "Disponible únicamente con la compra del curso."}
+          </p>
+          {initialData.isTrailer && (
+            <p className="font-bold text-accent">Tráiler principal del curso</p>
           )}
-        </p>
+        </div>
       )}
       {isEditing && (
         <Form {...form}>
@@ -109,6 +111,25 @@ export const ChapterAccessForm = ({
                   <div className="space-y-1 leading-none">
                     <FormDescription>
                       Habilitar esta lección como vista previa gratuita.
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="isTrailer"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormDescription>
+                      Usar esta lección como tráiler en la página del curso. Quedará disponible como vista previa gratuita.
                     </FormDescription>
                   </div>
                 </FormItem>

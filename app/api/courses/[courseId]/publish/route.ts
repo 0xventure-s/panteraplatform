@@ -26,7 +26,8 @@ export async function PATCH(
           include: {
             muxData: true,
           }
-        }
+        },
+        faqs: true,
       }
     });
 
@@ -35,6 +36,12 @@ export async function PATCH(
     }
 
     const hasPublishedChapter = course.chapters.some((chapter) => chapter.isPublished);
+    const hasPublishedTrailer = course.chapters.some(
+      (chapter) =>
+        chapter.isPublished &&
+        chapter.isTrailer &&
+        Boolean(chapter.muxData?.playbackId),
+    );
 
     if (
       !course.title ||
@@ -43,7 +50,16 @@ export async function PATCH(
       !course.categoryId ||
       !course.price ||
       Number(course.price) <= 0 ||
-      !hasPublishedChapter
+      !course.subtitle ||
+      !course.level ||
+      !course.estimatedMinutes ||
+      course.outcomes.length === 0 ||
+      course.targetAudience.length === 0 ||
+      !course.projectTitle ||
+      !course.projectDescription ||
+      course.faqs.length === 0 ||
+      !hasPublishedChapter ||
+      !hasPublishedTrailer
     ) {
       return new NextResponse("Faltan campos obligatorios", { status: 400 });
     }

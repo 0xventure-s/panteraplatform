@@ -40,7 +40,15 @@ export async function PATCH(
       }
     });
 
-    if (!chapter || !muxData || !chapter.title || !chapter.description || !chapter.videoUrl) {
+    if (
+      !chapter ||
+      !muxData?.playbackId ||
+      !chapter.title ||
+      !chapter.description ||
+      !chapter.videoUrl ||
+      !chapter.moduleTitle ||
+      !chapter.durationMinutes
+    ) {
       return new NextResponse("Faltan campos obligatorios", { status: 400 });
     }
 

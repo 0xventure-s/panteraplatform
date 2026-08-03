@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "typecheck": "tsc --noEmit",
+    "seed": "node --env-file=.env scripts/seed.mjs",
     "postinstall": "prisma generate"
+  },
+  "prisma": {
+    "seed": "npm run seed"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^16.3.0",
@@ -60,6 +64,7 @@
   },
   "devDependencies": {
     "eslint": "^8.57.1",
+    "pg": "^8.22.0",
     "prisma": "^5.3.0"
   }
 }

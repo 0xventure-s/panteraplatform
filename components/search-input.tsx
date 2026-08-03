@@ -1,10 +1,10 @@
 "use client";
 
 import qs from "query-string";
-import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
+import { ThreeDIcon } from "@/components/three-d-icon";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "@/hooks/use-debounce";
 
@@ -32,15 +32,15 @@ export const SearchInput = () => {
 
   return (
     <div className="relative">
-      <Search
-        className="h-4 w-4 absolute top-3 left-3 text-slate-600"
-      />
+      <span className="pointer-events-none absolute left-2 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center">
+        <ThreeDIcon name="zoom" size={25} />
+      </span>
       <Input
         onChange={(e) => setValue(e.target.value)}
         value={value}
-        className="w-full rounded-full bg-card pl-9 md:w-[320px]"
+        className="h-11 w-full rounded-full border-foreground/10 bg-card pl-11 md:w-[320px]"
         placeholder="Buscar un curso"
       />
     </div>
-  )
-}
+  );
+};

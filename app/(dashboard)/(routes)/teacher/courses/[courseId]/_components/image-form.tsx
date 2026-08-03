@@ -36,7 +36,7 @@ export const ImageForm = ({
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       await axios.patch(`/api/courses/${courseId}`, values);
-      toast.success("Portada actualizada");
+      toast.success("Portada del tráiler actualizada");
       toggleEdit();
       router.refresh();
     } catch {
@@ -47,7 +47,7 @@ export const ImageForm = ({
   return (
     <div className="mt-6 rounded-2xl border border-foreground/10 bg-card p-4">
       <div className="font-medium flex items-center justify-between">
-        Portada
+        Portada del tráiler
         <Button onClick={toggleEdit} variant="ghost">
           {isEditing && (
             <>Cancelar</>
@@ -93,7 +93,7 @@ export const ImageForm = ({
             }}
           />
           <div className="text-xs text-muted-foreground mt-4">
-            Usá una imagen horizontal en proporción 16:9.
+            Se muestra antes de reproducir el tráiler y al compartir el curso. Usá una imagen horizontal en proporción 16:9.
           </div>
         </div>
       )}

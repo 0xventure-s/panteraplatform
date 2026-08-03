@@ -94,6 +94,11 @@ export const ChaptersList = ({
                     </div>
                     {chapter.title}
                     <div className="ml-auto pr-2 flex items-center gap-x-2">
+                      {chapter.isTrailer && (
+                        <Badge className="bg-secondary text-foreground hover:bg-secondary">
+                          Tráiler
+                        </Badge>
+                      )}
                       {chapter.isFree && (
                         <Badge>
                           Vista previa

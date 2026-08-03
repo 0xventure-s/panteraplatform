@@ -30,11 +30,13 @@ const AnalyticsPage = async () => {
         <DataCard
           label="Ingresos confirmados"
           value={totalRevenue}
+          icon="wallet"
           shouldFormat
         />
         <DataCard
           label="Ventas aprobadas"
           value={totalSales}
+          icon="credit-card"
         />
       </div>
       <Chart

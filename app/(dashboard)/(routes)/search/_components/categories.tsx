@@ -1,16 +1,8 @@
 "use client";
 
-import { Category } from "@prisma/client";
-import {
-  FcEngineering,
-  FcFilmReel,
-  FcMultipleDevices,
-  FcMusic,
-  FcOldTimeCamera,
-  FcSalesPerformance,
-  FcSportsMode
-} from "react-icons/fc";
-import { IconType } from "react-icons";
+import type { Category } from "@prisma/client";
+
+import type { ThreeDIconName } from "@/components/three-d-icon";
 
 import { CategoryItem } from "./category-item";
 
@@ -18,14 +10,12 @@ interface CategoriesProps {
   items: Category[];
 }
 
-const iconMap: Record<Category["name"], IconType> = {
-  "Music": FcMusic,
-  "Photography": FcOldTimeCamera,
-  "Fitness": FcSportsMode,
-  "Accounting": FcSalesPerformance,
-  "Computer Science": FcMultipleDevices,
-  "Filming": FcFilmReel,
-  "Engineering": FcEngineering,
+const iconMap: Partial<Record<Category["name"], ThreeDIconName>> = {
+  "IA aplicada": "bulb",
+  Producto: "rocket",
+  Automatización: "setting",
+  Prototipado: "computer",
+  Agentes: "robot",
 };
 
 export const Categories = ({
@@ -37,10 +27,10 @@ export const Categories = ({
         <CategoryItem
           key={item.id}
           label={item.name}
-          icon={iconMap[item.name]}
+          icon={iconMap[item.name] ?? "cube"}
           value={item.id}
         />
       ))}
     </div>
-  )
-}
+  );
+};

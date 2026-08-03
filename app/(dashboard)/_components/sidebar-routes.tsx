@@ -1,40 +1,57 @@
 "use client";
 
-import { BarChart3, Compass, CreditCard, LayoutDashboard, List } from "lucide-react";
 import { usePathname } from "next/navigation";
+
+import type { ThreeDIconName } from "@/components/three-d-icon";
 
 import { SidebarItem } from "./sidebar-item";
 
-const studentRoutes = [
+interface SidebarRoute {
+  icon: ThreeDIconName;
+  label: string;
+  href: string;
+}
+
+const studentRoutes: SidebarRoute[] = [
   {
-    icon: LayoutDashboard,
+    icon: "zoom",
+    label: "Explorar cursos",
+    href: "/search",
+  },
+  {
+    icon: "computer",
     label: "Mi aprendizaje",
     href: "/dashboard",
   },
   {
-    icon: Compass,
-    label: "Explorar cursos",
-    href: "/search",
+    icon: "chart",
+    label: "Ranking",
+    href: "/ranking",
+  },
+  {
+    icon: "profile",
+    label: "Mi perfil",
+    href: "/perfil",
   },
 ];
 
-const adminRoutes = [
+const adminRoutes: SidebarRoute[] = [
   {
-    icon: List,
+    icon: "notebook",
     label: "Cursos",
     href: "/admin/cursos",
   },
   {
-    icon: BarChart3,
+    icon: "chart",
     label: "Analíticas",
     href: "/admin/analiticas",
   },
   {
-    icon: CreditCard,
+    icon: "link",
     label: "Integraciones",
     href: "/admin/integraciones",
   },
-]
+];
 
 export const SidebarRoutes = ({ canAccessAdmin }: { canAccessAdmin: boolean }) => {
   const pathname = usePathname();
@@ -55,9 +72,9 @@ export const SidebarRoutes = ({ canAccessAdmin }: { canAccessAdmin: boolean }) =
       ))}
       {!isAdminPage && canAccessAdmin && (
         <div className="mt-5 border-t border-foreground/10 pt-5">
-          <SidebarItem icon={List} label="Administración" href="/admin/cursos" />
+          <SidebarItem icon="notebook" label="Administración" href="/admin/cursos" />
         </div>
       )}
     </div>
-  )
-}
+  );
+};

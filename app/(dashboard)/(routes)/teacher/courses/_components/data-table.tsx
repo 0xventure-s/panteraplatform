@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { ThreeDIcon } from "@/components/three-d-icon"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -55,17 +56,22 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4 justify-between">
-        <Input
-          placeholder="Buscar por título"
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <Link href="/admin/cursos/nuevo">
-          <Button className="rounded-full">
+      <div className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative w-full max-w-sm">
+          <span className="pointer-events-none absolute left-2 top-1/2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center">
+            <ThreeDIcon name="zoom" size={25} />
+          </span>
+          <Input
+            placeholder="Buscar por título"
+            value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("title")?.setFilterValue(event.target.value)
+            }
+            className="h-11 rounded-full border-foreground/10 bg-card pl-11"
+          />
+        </div>
+        <Link href="/admin/cursos/nuevo" className="shrink-0">
+          <Button className="w-full rounded-full sm:w-auto">
             <PlusCircle className="h-4 w-4 mr-2" />
             Nuevo curso
           </Button>
