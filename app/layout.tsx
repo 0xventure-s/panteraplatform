@@ -1,39 +1,57 @@
-import './globals.css'
-import type { Metadata } from 'next'
-import { DM_Serif_Display, Manrope } from 'next/font/google'
-import { ToastProvider } from '@/components/providers/toaster-provider'
-import { ConfettiProvider } from '@/components/providers/confetti-provider'
+import "./globals.css";
+import type { Metadata } from "next";
+import { DM_Serif_Display, Manrope } from "next/font/google";
+
+import { ConfettiProvider } from "@/components/providers/confetti-provider";
+import { ToastProvider } from "@/components/providers/toaster-provider";
+import { siteConfig } from "@/lib/site-config";
 
 const manrope = Manrope({
-  subsets: ['latin'],
-  variable: '--font-sans',
-})
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
 const display = DM_Serif_Display({
-  subsets: ['latin'],
-  weight: '400',
-  variable: '--font-display',
-})
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-display",
+});
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://francoalonso.com'),
+  metadataBase: new URL(siteConfig.url),
+  applicationName: siteConfig.name,
   title: {
-    default: 'Franco Alonso | Cursos de IA para construir productos',
-    template: '%s | Franco Alonso',
+    default: `${siteConfig.name} | Cursos de IA para construir productos`,
+    template: `%s | ${siteConfig.name}`,
   },
-  description: 'Cursos de IA orientados a construir, validar y lanzar productos reales.',
+  description: siteConfig.description,
   openGraph: {
-    title: 'Franco Alonso',
-    description: 'Cursos de IA para construir productos.',
-    type: 'website',
-    locale: 'es_AR',
+    title: siteConfig.name,
+    description: siteConfig.shortDescription,
+    siteName: siteConfig.name,
+    type: "website",
+    locale: "es_AR",
+    images: [
+      {
+        url: siteConfig.logo,
+        width: 1254,
+        height: 1254,
+        alt: "Kiwi Academia",
+      },
+    ],
   },
-}
+  twitter: {
+    card: "summary",
+    title: siteConfig.name,
+    description: siteConfig.shortDescription,
+    images: [siteConfig.logo],
+  },
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="es">

@@ -4,8 +4,6 @@
   <rect width="1200" height="750" fill="#eaf2ff"/>
   <path d="M820-40h420v830H820z" fill="#246bfd"/>
   <path d="M730 60h180v180H730zM640 285h180v180H640zM730 510h180v180H730z" fill="#ffd84d"/>
-  <rect x="76" y="72" width="118" height="118" rx="30" fill="#161a22"/>
-  <text x="135" y="148" text-anchor="middle" fill="#eaf2ff" font-family="Arial, sans-serif" font-size="42" font-weight="800">FA</text>
   <text x="76" y="305" fill="#161a22" font-family="Arial, sans-serif" font-size="78" font-weight="800">AUTOMATIZÁ</text>
   <text x="76" y="393" fill="#161a22" font-family="Arial, sans-serif" font-size="78" font-weight="800">CON IA</text>
   <text x="80" y="450" fill="#246bfd" font-family="Arial, sans-serif" font-size="25" font-weight="700" letter-spacing="4">FLUJOS DE PUNTA A PUNTA</text>

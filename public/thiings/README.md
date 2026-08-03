@@ -22,3 +22,5 @@ Source pages:
 - https://www.thiings.co/things/workflow
 
 Usage remains subject to the [Thiings terms](https://www.thiings.co/terms). Do not redistribute these files as a standalone icon pack.
+
+`kiwi.png` is an original brand asset created for Kiwi Academia in the same soft 3D visual language. It is not part of The Thiings Collection.

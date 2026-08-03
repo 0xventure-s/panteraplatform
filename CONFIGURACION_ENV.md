@@ -1,15 +1,15 @@
 # Configuración de variables y servicios
 
-El archivo `.env` incluido en el proyecto contiene la configuración objetivo para `francoalonso.com`. Está ignorado por Git y no debe copiarse en commits, capturas ni mensajes.
+El archivo `.env` incluido en el proyecto contiene la configuración de Kiwi Academia. Está ignorado por Git y no debe copiarse en commits, capturas ni mensajes.
 
 ## Aplicación y WhatsApp
 
 ```env
-NEXT_PUBLIC_APP_URL="https://francoalonso.com"
-NEXT_PUBLIC_SITE_NAME="Franco Alonso"
+NEXT_PUBLIC_APP_URL=""
+NEXT_PUBLIC_SITE_NAME="Kiwi Academia"
 NEXT_PUBLIC_SITE_DESCRIPTION="Cursos de IA para construir productos."
 NEXT_PUBLIC_WHATSAPP_NUMBER=""
-NEXT_PUBLIC_WHATSAPP_MESSAGE="Hola, Franco. Quiero consultar por los cursos de IA."
+NEXT_PUBLIC_WHATSAPP_MESSAGE="Hola. Quiero consultar por los cursos de Kiwi Academia."
 ```
 
 - `NEXT_PUBLIC_APP_URL`: dominio canónico, sin barra final.
@@ -21,12 +21,12 @@ NEXT_PUBLIC_WHATSAPP_MESSAGE="Hola, Franco. Quiero consultar por los cursos de I
 Variables:
 
 ```env
-BETTER_AUTH_URL="https://francoalonso.com"
+BETTER_AUTH_URL=""
 BETTER_AUTH_SECRET=""
 ADMIN_EMAIL=""
 ADMIN_USER_ID=""
 RESEND_API_KEY=""
-AUTH_EMAIL_FROM="Franco Alonso <acceso@francoalonso.com>"
+AUTH_EMAIL_FROM=""
 ```
 
 Obtención:
@@ -69,7 +69,7 @@ Variables:
 ```env
 MERCADOPAGO_CLIENT_ID=""
 MERCADOPAGO_CLIENT_SECRET=""
-MERCADOPAGO_REDIRECT_URI="https://francoalonso.com/api/mercadopago/oauth/callback"
+MERCADOPAGO_REDIRECT_URI=""
 MERCADOPAGO_WEBHOOK_SECRET=""
 INTEGRATION_ENCRYPTION_KEY=""
 ```
@@ -77,12 +77,12 @@ INTEGRATION_ENCRYPTION_KEY=""
 Obtención:
 
 1. Ingresar a [Mercado Pago Developers](https://www.mercadopago.com.ar/developers/panel/app).
-2. Crear una aplicación llamada **Franco Alonso**.
+2. Crear una aplicación llamada **Kiwi Academia**.
 3. Elegir pagos online y Checkout Pro.
 4. Abrir **Detalles de la aplicación** y copiar el Client ID y el Client Secret.
-5. Registrar `https://francoalonso.com/api/mercadopago/oauth/callback` como Redirect URL exacta.
+5. Registrar la URL pública de Kiwi Academia seguida de `/api/mercadopago/oauth/callback` como Redirect URL exacta.
 6. Habilitar OAuth con Authorization Code y PKCE.
-7. Abrir **Webhooks**, registrar `https://francoalonso.com/api/webhooks/mercadopago` y activar eventos de pagos.
+7. Abrir **Webhooks**, registrar la URL pública de Kiwi Academia seguida de `/api/webhooks/mercadopago` y activar eventos de pagos.
 8. Guardar la clave secreta generada para la firma en `MERCADOPAGO_WEBHOOK_SECRET`.
 9. Generar `INTEGRATION_ENCRYPTION_KEY` con al menos 32 caracteres aleatorios y guardarla también en el hosting.
 10. Ingresar como administrador en el sitio y abrir **Administración → Integraciones → Conectar Mercado Pago**.

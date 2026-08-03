@@ -254,7 +254,7 @@ export const createMercadoPagoPreference = async (
       },
       auto_return: "approved",
       notification_url: `${appUrl}/api/webhooks/mercadopago`,
-      statement_descriptor: "FRANCO ALONSO",
+      statement_descriptor: "KIWI ACADEMIA",
     }),
     cache: "no-store",
   });

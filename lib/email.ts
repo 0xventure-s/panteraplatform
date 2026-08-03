@@ -40,7 +40,7 @@ export const sendPasswordResetEmail = async ({
     body: JSON.stringify({
       from,
       to: [email],
-      subject: "Recuperá tu acceso a Franco Alonso",
+      subject: "Recuperá tu acceso a Kiwi Academia",
       html: `
         <div style="font-family:Arial,sans-serif;color:#1d1a18;line-height:1.6">
           <h1 style="font-size:24px">Elegí una nueva contraseña</h1>

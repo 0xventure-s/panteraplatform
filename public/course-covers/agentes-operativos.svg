@@ -5,8 +5,6 @@
   <circle cx="980" cy="380" r="270" fill="#a68cff"/>
   <circle cx="980" cy="380" r="166" fill="#17151c"/>
   <circle cx="980" cy="380" r="72" fill="#d7ff62"/>
-  <rect x="76" y="72" width="118" height="118" rx="30" fill="#d7ff62"/>
-  <text x="135" y="148" text-anchor="middle" fill="#17151c" font-family="Arial, sans-serif" font-size="42" font-weight="800">FA</text>
   <text x="76" y="307" fill="#f8f4ef" font-family="Arial, sans-serif" font-size="88" font-weight="800">AGENTES</text>
   <text x="76" y="401" fill="#f8f4ef" font-family="Arial, sans-serif" font-size="88" font-weight="800">OPERATIVOS</text>
   <text x="80" y="458" fill="#a68cff" font-family="Arial, sans-serif" font-size="25" font-weight="700" letter-spacing="4">IA QUE EJECUTA CON CONTROL</text>

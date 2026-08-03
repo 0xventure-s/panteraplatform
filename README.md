@@ -1,4 +1,4 @@
-# Franco Alonso
+# Kiwi Academia
 
 Plataforma de cursos de IA orientados a construir productos.
 

@@ -43,7 +43,7 @@ export const CourseCard = ({
             fill
             className="object-cover"
             alt={title}
-            src={imageUrl || "/logo.svg"}
+            src={imageUrl || "/thiings/kiwi.png"}
           />
         </div>
         <div className="flex flex-col pt-2">

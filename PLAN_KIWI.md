@@ -1,12 +1,12 @@
-# Plan de migración a francoalonso.com
+# Plan de lanzamiento de Kiwi Academia
 
 ## Objetivo
 
-Convertir el LMS actual en la plataforma de cursos de Franco Alonso, enfocada en IA aplicada a la construcción de productos.
+Convertir el LMS actual en Kiwi Academia, enfocada en IA aplicada a la construcción de productos.
 
 El resultado tendrá tres áreas bien separadas:
 
-- Sitio público para presentar a Franco Alonso, mostrar los cursos y resolver consultas.
+- Sitio público para presentar Kiwi Academia, mostrar los cursos y resolver consultas.
 - Campus del alumno con acceso, cursos comprados y progreso individual.
 - Administración privada para crear, editar y publicar cursos.
 
@@ -14,7 +14,7 @@ El resultado tendrá tres áreas bien separadas:
 
 ### Implementado
 
-- Marca Franco Alonso, portada pública, perfil, catálogo, detalle de curso, metadata, Open Graph, sitemap, robots y favicon propio.
+- Marca Kiwi Academia, portada pública, perfil, catálogo, detalle de curso, metadata, Open Graph, sitemap, robots y favicon propio.
 - Campus en `/dashboard` y `/mis-cursos`, progreso persistente, próxima lección, estados vacíos y lecciones pagas protegidas.
 - Better Auth con correo y contraseña, cierre de sesión, recuperación de acceso, sesiones en PostgreSQL y autorización administrativa en servidor.
 - Administración en `/admin`: cursos, capítulos, publicación, archivos, video, analíticas e integración de Mercado Pago.
@@ -39,13 +39,13 @@ El resultado tendrá tres áreas bien separadas:
 - Completar credenciales y webhooks de Mercado Pago; luego validar pagos de prueba aprobados, pendientes, rechazados y reintentos.
 - Completar credenciales de Mux y UploadThing y validar carga, reproducción y descarga.
 - Incorporar recursos de Thiings únicamente después de confirmar una licencia comercial válida.
-- Desplegar, conectar `francoalonso.com`, decidir la redirección de `www` y repetir la validación final sobre HTTPS.
+- Desplegar, conectar el dominio público de Kiwi Academia, decidir la redirección de `www` y repetir la validación final sobre HTTPS.
 
 ## Decisiones de producto
 
-- Marca: **Franco Alonso**.
+- Marca: **Kiwi Academia**.
 - Propuesta principal: **Cursos de IA para construir productos.**
-- Dominio canónico: `https://francoalonso.com`.
+- Dominio canónico: el origen configurado en `NEXT_PUBLIC_APP_URL`.
 - Acceso: Better Auth con correo y contraseña sobre la base PostgreSQL del proyecto.
 - Administración: una única cuenta autorizada mediante `ADMIN_EMAIL`, `ADMIN_USER_ID` o el rol persistido `admin`.
 - Pagos: conexión OAuth desde Administración, Mercado Pago Checkout Pro, cobros en pesos argentinos y acreditación por webhook.
@@ -80,17 +80,17 @@ Las rutas actuales bajo `/teacher` redirigen a `/admin`. La portada es pública 
 
 ## Fase 1 — Marca, estructura y contenido
 
-1. Reemplazar el logo genérico, favicon, título, descripción y metadatos por Franco Alonso.
+1. Reemplazar el logo genérico, favicon, título, descripción y metadatos por Kiwi Academia.
 2. Crear la portada pública con una jerarquía corta:
    - Hero con la propuesta principal.
    - Cursos publicados.
    - Qué construye el alumno durante la formación.
-   - Perfil de Franco Alonso, con información real provista por el titular.
+   - Perfil del equipo docente, con información real provista por sus integrantes.
    - Preguntas frecuentes basadas en condiciones reales de compra y acceso.
    - Acceso y contacto por WhatsApp.
 3. Mover el dashboard actual de `/` a `/dashboard`.
 4. Traducir todo el producto al español natural: navegación, estados, errores, formularios, botones y mensajes de compra.
-5. Crear metadata, Open Graph, `robots.txt`, `sitemap.xml` y URL canónica para `francoalonso.com`.
+5. Crear metadata, Open Graph, `robots.txt`, `sitemap.xml` y URL canónica a partir de `NEXT_PUBLIC_APP_URL`.
 
 ### Criterios de aceptación
 
@@ -225,11 +225,11 @@ Las rutas actuales bajo `/teacher` redirigen a `/admin`. La portada es pública 
 
 ## Fase 8 — Dominio y salida a producción
 
-1. Conectar `francoalonso.com` al proveedor de hosting.
-2. Redirigir `www.francoalonso.com` al dominio canónico o aplicar la decisión inversa de forma consistente.
+1. Conectar el dominio público de Kiwi Academia al proveedor de hosting.
+2. Redirigir la variante `www` al dominio canónico o aplicar la decisión inversa de forma consistente.
 3. Cargar las variables de producción del archivo `.env` en el hosting, sin subir el archivo al repositorio.
 4. Configurar `BETTER_AUTH_URL`, el secreto de sesión y el remitente de recuperación para producción.
-5. Registrar `https://francoalonso.com/api/webhooks/mercadopago` en Mercado Pago.
+5. Registrar la URL pública de Kiwi Academia seguida de `/api/webhooks/mercadopago` en Mercado Pago.
 6. Activar credenciales productivas únicamente después de validar el circuito completo con credenciales de prueba.
 7. Verificar HTTPS, metadata social, indexación y enlaces absolutos.
 

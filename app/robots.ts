@@ -1,7 +1,9 @@
 import type { MetadataRoute } from "next";
 
+import { siteConfig } from "@/lib/site-config";
+
 export default function robots(): MetadataRoute.Robots {
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://francoalonso.com";
+  const siteUrl = siteConfig.url.replace(/\/$/, "");
 
   return {
     rules: {

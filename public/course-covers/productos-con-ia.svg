@@ -4,8 +4,6 @@
   <rect width="1200" height="750" fill="#f5eee5"/>
   <circle cx="1015" cy="128" r="245" fill="#ff7657"/>
   <path d="M-70 690C175 410 380 368 628 510S1035 663 1270 350V820H-70Z" fill="#191715"/>
-  <rect x="76" y="72" width="118" height="118" rx="30" fill="#191715"/>
-  <text x="135" y="148" text-anchor="middle" fill="#f5eee5" font-family="Arial, sans-serif" font-size="42" font-weight="800">FA</text>
   <text x="76" y="288" fill="#191715" font-family="Arial, sans-serif" font-size="88" font-weight="800">PRODUCTOS</text>
   <text x="76" y="382" fill="#191715" font-family="Arial, sans-serif" font-size="88" font-weight="800">CON IA</text>
   <text x="80" y="438" fill="#645d57" font-family="Arial, sans-serif" font-size="25" font-weight="700" letter-spacing="4">DE IDEA A PRODUCTO</text>

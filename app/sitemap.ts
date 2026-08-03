@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
 
 import { db } from "@/lib/db";
+import { siteConfig } from "@/lib/site-config";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://francoalonso.com";
+  const siteUrl = siteConfig.url.replace(/\/$/, "");
   const courses = await db.course.findMany({
     where: { isPublished: true },
     select: { id: true, updatedAt: true },

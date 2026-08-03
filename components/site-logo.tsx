@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
@@ -17,15 +18,22 @@ export const SiteLogo = ({
     <Link
       href={href}
       className={cn("inline-flex items-center gap-3", className)}
-      aria-label="Franco Alonso"
+      aria-label="Kiwi Academia"
     >
-      <span className="grid h-10 w-10 place-items-center rounded-[14px] bg-foreground text-sm font-extrabold text-background shadow-[3px_3px_0_0_hsl(var(--secondary))]">
-        FA
+      <span className="relative block h-12 w-12 shrink-0">
+        <Image
+          src="/thiings/kiwi.png"
+          alt=""
+          width={48}
+          height={48}
+          priority
+          className="h-full w-full object-contain"
+        />
       </span>
       {!compact && (
         <span className="leading-none">
-          <span className="block text-sm font-extrabold tracking-[-0.03em]">
-            Franco Alonso
+          <span className="block whitespace-nowrap text-base font-extrabold tracking-[-0.03em]">
+            Kiwi Academia
           </span>
           <span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
             IA · Producto

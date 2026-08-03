@@ -1,4 +1,4 @@
--- Esquema inicial de Franco Alonso para PostgreSQL.
+-- Esquema inicial de Kiwi Academia para PostgreSQL.
 CREATE TYPE "PaymentStatus" AS ENUM (
   'PENDING',
   'APPROVED',

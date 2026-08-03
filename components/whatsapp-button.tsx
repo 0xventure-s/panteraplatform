@@ -12,7 +12,9 @@ export const WhatsAppButton = ({
   compact = false,
 }: WhatsAppButtonProps) => {
   const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, "");
-  const message = process.env.NEXT_PUBLIC_WHATSAPP_MESSAGE || "Hola, Franco.";
+  const message =
+    process.env.NEXT_PUBLIC_WHATSAPP_MESSAGE ||
+    "Hola. Quiero consultar por los cursos de Kiwi Academia.";
 
   if (!number) {
     return null;

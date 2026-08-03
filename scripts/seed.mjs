@@ -6,7 +6,7 @@ import pg from "pg";
 const { Client } = pg;
 
 const ADMIN_EMAIL = "alonsofranco1999@gmail.com";
-const ADMIN_NAME = "Alonso Franco";
+const ADMIN_NAME = "Equipo Kiwi Academia";
 
 const categories = [
   { id: "30000000-0000-4000-8000-000000000001", name: "IA aplicada" },
